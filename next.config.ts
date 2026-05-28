@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  turbopack: {
+    root: "C:\\Users\\sayan\\OneDrive\\Desktop\\workhire-saas",
+  },
 };
 
 export default nextConfig;
