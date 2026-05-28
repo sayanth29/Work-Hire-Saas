@@ -2,9 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import connectDB from '@/lib/db'
 import User from '@/models/User'
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req.headers)
+    const limit = checkRateLimit(`auth-reset:${ip}`, 12, 60_000)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many reset attempts. Please try again shortly.' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSec) } }
+      )
+    }
+
     await connectDB()
 
     const { token, password } = await req.json()

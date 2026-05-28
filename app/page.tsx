@@ -14,7 +14,6 @@ import {
   Briefcase,
   CheckCircle2,
   ShieldCheck,
-  Zap,
   Sparkles,
   MessageSquare,
   BarChart3,
@@ -59,6 +58,15 @@ const howItWorks = [
   },
 ]
 
+type LandingRecentJob = {
+  _id: { toString: () => string }
+  title: string
+  type: string
+  location?: string
+  salary?: { min?: number; currency?: string }
+  companyId?: { name?: string; industry?: string }
+}
+
 export default async function LandingPage() {
   await connectDB()
 
@@ -73,6 +81,7 @@ export default async function LandingPage() {
     .sort({ createdAt: -1 })
     .limit(6)
     .lean()
+  const typedRecentJobs = recentJobs as unknown as LandingRecentJob[]
 
   return (
     <div className="min-h-screen bg-[#fafbff] selection:bg-primary/20 selection:text-primary relative overflow-hidden flex flex-col justify-between" style={{ fontFamily: 'Geist, sans-serif' }}>
@@ -332,7 +341,7 @@ export default async function LandingPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(recentJobs as any[]).map(job => {
+          {typedRecentJobs.map(job => {
             const isINR = (job.salary?.currency || 'INR') === 'INR'
             const symbol = isINR ? '₹' : '$'
             const salaryText = job.salary?.min 

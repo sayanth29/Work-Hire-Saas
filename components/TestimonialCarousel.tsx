@@ -67,7 +67,7 @@ export default function TestimonialCarousel() {
                   ))}
                 </div>
                 <p className="text-xs md:text-sm text-muted leading-relaxed font-semibold italic">
-                  "{quote}"
+                  &quot;{quote}&quot;
                 </p>
               </div>
 

@@ -6,6 +6,25 @@
 
 import { useState } from 'react'
 import axios from 'axios'
+import type { AxiosError } from 'axios'
+
+type RazorpayResponse = {
+  razorpay_order_id: string
+  razorpay_payment_id: string
+  razorpay_signature: string
+}
+
+type RazorpayOptions = {
+  key: string | undefined
+  amount: number
+  currency: string
+  name: string
+  description: string
+  order_id: string
+  handler: (response: RazorpayResponse) => Promise<void>
+  prefill: { name: string; email: string }
+  theme: { color: string }
+}
 
 const plans = [
   {
@@ -78,7 +97,7 @@ export default function BillingPage() {
           name:        'WorkHire',
           description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
           order_id:    data.orderId,
-          handler:     async (response: any) => {
+          handler:     async (response: RazorpayResponse) => {
             try {
               await axios.post('/api/razorpay/verify', {
                 razorpay_order_id:   response.razorpay_order_id,
@@ -96,11 +115,13 @@ export default function BillingPage() {
           theme:    { color: '#3525cd' },
         }
 
-        const rzp = new (window as any).Razorpay(options)
+        const razorpayWindow = window as unknown as Window & { Razorpay: new (opts: RazorpayOptions) => { open: () => void } }
+        const rzp = new razorpayWindow.Razorpay(options)
         rzp.open()
       }
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to initiate payment')
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<{ error?: string }>
+      setError(axiosErr.response?.data?.error || 'Failed to initiate payment')
     } finally {
       setLoading(null)
     }

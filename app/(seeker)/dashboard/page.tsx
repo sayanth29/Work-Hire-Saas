@@ -7,20 +7,32 @@ import { authOptions } from '@/utils/auth'
 import connectDB from '@/lib/db'
 import Application from '@/models/Application'
 import Job from '@/models/Job'
-import Company from '@/models/Company'
 import Link from 'next/link'
 import { 
   ClipboardList, 
   Target, 
   CheckCircle2, 
   Clock, 
-  ArrowRight, 
   FileText, 
   Compass, 
-  Briefcase, 
   ChevronRight,
   TrendingUp
 } from 'lucide-react'
+
+type DashboardApp = {
+  _id: { toString: () => string }
+  status: string
+  companyId?: { name?: string }
+  jobId?: { title?: string; location?: string }
+}
+
+type DashboardJob = {
+  _id: { toString: () => string }
+  title: string
+  type: string
+  location?: string
+  companyId?: { name?: string }
+}
 
 export default async function SeekerDashboardPage() {
   const session = await getServerSession(authOptions)
@@ -63,6 +75,8 @@ export default async function SeekerDashboardPage() {
     .sort({ createdAt: -1 })
     .limit(4)
     .lean()
+  const typedApplications = applications as unknown as DashboardApp[]
+  const typedRecentJobs = recentJobs as unknown as DashboardJob[]
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -119,7 +133,7 @@ export default async function SeekerDashboardPage() {
               </Link>
             </div>
 
-            {applications.length === 0 ? (
+            {typedApplications.length === 0 ? (
               <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl">
                 <span className="text-3xl inline-block mb-3">📭</span>
                 <p className="text-sm font-semibold text-muted">No applications submitted yet</p>
@@ -133,7 +147,7 @@ export default async function SeekerDashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {applications.map((app: any) => (
+                {typedApplications.map(app => (
                   <div 
                     key={app._id.toString()} 
                     className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-100 hover:border-primary/10 hover:bg-slate-50/40 transition-all duration-200 group"
@@ -229,23 +243,23 @@ export default async function SeekerDashboardPage() {
           </Link>
         </div>
         
-        {recentJobs.length === 0 ? (
+        {typedRecentJobs.length === 0 ? (
           <p className="text-xs text-muted text-center py-8">No live jobs available at this moment</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {recentJobs.map((job: any) => (
+            {typedRecentJobs.map(job => (
               <Link
                 key={job._id.toString()}
                 href={`/jobs/${job._id}`}
                 className="flex items-center gap-4.5 p-4 rounded-2xl border border-slate-100 hover:border-primary/15 hover:bg-slate-50/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.015)] transition-all group"
               >
                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-50 to-primary/5 border border-primary/10 flex items-center justify-center text-base font-bold text-primary shrink-0 group-hover:scale-102 transition-transform">
-                  {(job.companyId as any)?.name?.charAt(0).toUpperCase() || '?'}
+                  {job.companyId?.name?.charAt(0).toUpperCase() || '?'}
                 </div>
                 <div className="overflow-hidden space-y-1">
                   <p className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">{job.title}</p>
                   <p className="text-[10px] text-muted truncate">
-                    {(job.companyId as any)?.name} · {job.location || 'Remote'}
+                    {job.companyId?.name} · {job.location || 'Remote'}
                   </p>
                 </div>
                 <span className="ml-auto shrink-0 text-[9px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200/50 uppercase tracking-wider">

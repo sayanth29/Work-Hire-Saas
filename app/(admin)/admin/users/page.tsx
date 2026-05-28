@@ -23,7 +23,7 @@ export default async function AdminUsersPage() {
     .lean()
 
   // Serialize Mongoose models for Next.js Client Component compatibility
-  const users = rawUsers.map((user: any) => ({
+  const users = rawUsers.map(user => ({
     _id: user._id.toString(),
     name: user.name || 'Unknown',
     email: user.email,

@@ -16,8 +16,7 @@ import {
   ClipboardList, 
   DollarSign, 
   ChevronRight,
-  CheckCircle2,
-  AlertTriangle
+  CheckCircle2
 } from 'lucide-react'
 
 export default async function AdminOverviewPage() {
@@ -123,7 +122,7 @@ export default async function AdminOverviewPage() {
         </div>
 
         <div className="space-y-3">
-          {(recentCompanies as any[]).map(company => (
+          {recentCompanies.map(company => (
             <div 
               key={company._id.toString()} 
               className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-100 hover:border-slate-200/80 transition-all duration-200 group bg-slate-50/20"

@@ -12,7 +12,6 @@ import {
   Briefcase, 
   Shield, 
   CheckCircle, 
-  AlertTriangle,
   Clock
 } from 'lucide-react'
 
@@ -23,6 +22,14 @@ interface UserItem {
   role: string
   isEmailVerified: boolean
   createdAt: string | Date
+}
+
+type RoleStyle = {
+  bg: string
+  text: string
+  border: string
+  label: string
+  icon: React.ComponentType<{ className?: string }>
 }
 
 interface Props {
@@ -65,7 +72,7 @@ export default function AdminUsersList({ initialUsers, currentUserId }: Props) {
     }
   }
 
-  const roleStyles: Record<string, { bg: string; text: string; border: string; label: string; icon: any }> = {
+  const roleStyles: Record<string, RoleStyle> = {
     admin: { 
       bg: 'bg-rose-500/10', 
       text: 'text-rose-600', 

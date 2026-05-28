@@ -4,14 +4,12 @@
 
 import connectDB from '@/lib/db'
 import Job from '@/models/Job'
-import Company from '@/models/Company'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { 
   Search, 
   MapPin, 
   Briefcase, 
-  DollarSign, 
   SlidersHorizontal,
   X,
   Compass,
@@ -33,11 +31,23 @@ interface Props {
   }>
 }
 
+type JobCard = {
+  _id: { toString: () => string }
+  title: string
+  type: string
+  location?: string
+  experience?: string
+  createdAt: Date | string
+  skills?: string[]
+  salary?: { min?: number; max?: number; currency?: string }
+  companyId?: { name?: string; industry?: string }
+}
+
 export default async function JobsPage({ searchParams }: Props) {
   await connectDB()
 
   const params = await searchParams
-  const filter: any = { status: 'active' }
+  const filter: Record<string, unknown> = { status: 'active' }
   if (params.search)   filter.title    = new RegExp(params.search, 'i')
   if (params.type)     filter.type     = params.type
   if (params.location) filter.location = new RegExp(params.location, 'i')
@@ -57,6 +67,7 @@ export default async function JobsPage({ searchParams }: Props) {
   ])
 
   const pages = Math.ceil(total / limit)
+  const typedJobs = jobs as unknown as JobCard[]
 
   const typeColors: Record<string, string> = {
     'full-time':  'bg-primary/10 text-primary border-primary/20',
@@ -232,7 +243,7 @@ export default async function JobsPage({ searchParams }: Props) {
               <p className="text-[10px] font-bold text-muted uppercase tracking-wider">
                 Showing <span className="text-foreground font-extrabold">{total}</span> jobs 
                 {params.search && (
-                  <> for <span className="text-primary font-extrabold">"{params.search}"</span></>
+                  <> for <span className="text-primary font-extrabold">&quot;{params.search}&quot;</span></>
                 )}
               </p>
               
@@ -248,7 +259,7 @@ export default async function JobsPage({ searchParams }: Props) {
             </div>
 
             {/* Jobs List container */}
-            {jobs.length === 0 ? (
+            {typedJobs.length === 0 ? (
               <div className="bg-white rounded-2xl border border-[#e2e8f0] p-12 text-center shadow-sm">
                 <p className="text-3xl mb-3">🔍</p>
                 <h3 className="text-sm font-bold text-foreground mb-1">No vacancies found</h3>
@@ -256,7 +267,7 @@ export default async function JobsPage({ searchParams }: Props) {
               </div>
             ) : (
               <div className="space-y-3.5">
-                {(jobs as any[]).map(job => (
+                {typedJobs.map(job => (
                   <Link
                     key={job._id.toString()}
                     href={`/jobs/${job._id}`}
@@ -312,15 +323,15 @@ export default async function JobsPage({ searchParams }: Props) {
                         </div>
 
                         {/* Skill Tags */}
-                        {job.skills?.length > 0 && (
+                        {(job.skills?.length ?? 0) > 0 && (
                           <div className="flex flex-wrap gap-1 pt-1">
-                            {job.skills.slice(0, 4).map((skill: string) => (
+                            {(job.skills ?? []).slice(0, 4).map((skill: string) => (
                               <span key={skill} className="px-2 py-0.5 rounded-full bg-slate-50 border border-slate-100 text-muted font-bold text-[9px]">
                                 {skill}
                               </span>
                             ))}
-                            {job.skills.length > 4 && (
-                              <span className="text-[9px] font-bold text-muted self-center ml-0.5">+{job.skills.length - 4} more</span>
+                            {(job.skills?.length ?? 0) > 4 && (
+                              <span className="text-[9px] font-bold text-muted self-center ml-0.5">+{(job.skills?.length ?? 0) - 4} more</span>
                             )}
                           </div>
                         )}

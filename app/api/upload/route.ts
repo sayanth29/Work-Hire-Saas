@@ -7,6 +7,7 @@ import { authOptions } from '@/utils/auth'
 import { v2 as cloudinary } from 'cloudinary'
 import fs from 'fs'
 import path from 'path'
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
@@ -16,6 +17,15 @@ cloudinary.config({
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req.headers)
+    const limit = checkRateLimit(`upload:${ip}`, 20, 60_000)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many uploads. Please wait and try again.' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSec) } }
+      )
+    }
+
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -23,7 +33,8 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData()
     const file     = formData.get('file') as File
-    const type     = formData.get('type') as string || 'resume'
+    const rawType = formData.get('type')
+    const type = rawType === 'avatar' ? 'avatar' : 'resume'
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -50,7 +61,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Upload to Cloudinary
-      const result = await new Promise<any>((resolve, reject) => {
+      const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
             folder:        `workhire/${type}s`,
@@ -58,8 +69,8 @@ export async function POST(req: NextRequest) {
             public_id:     `${session.user.id}_${Date.now()}`,
           },
           (error, result) => {
-            if (error) reject(error)
-            else resolve(result)
+            if (error || !result?.secure_url) reject(error || new Error('Upload failed'))
+            else resolve({ secure_url: result.secure_url })
           }
         )
         uploadStream.end(buffer)

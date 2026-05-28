@@ -21,7 +21,7 @@ export async function GET(_: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'Job not found' }, { status: 404 })
     }
     return NextResponse.json({ job })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
   }
 }
@@ -53,7 +53,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const updated = await Job.findByIdAndUpdate((await params).id, body, { new: true })
 
     return NextResponse.json({ message: 'Job updated!', job: updated })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
   }
 }
@@ -76,7 +76,7 @@ export async function DELETE(_: NextRequest, { params }: Params) {
 
     await Job.findByIdAndDelete((await params).id)
     return NextResponse.json({ message: 'Job deleted!' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
   }
 }

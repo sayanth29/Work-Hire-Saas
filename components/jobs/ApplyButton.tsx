@@ -4,6 +4,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
+import type { AxiosError } from 'axios'
 import Link from 'next/link'
 
 interface Props {
@@ -34,8 +35,9 @@ export default function ApplyButton({
       setSuccess(true)
       setOpen(false)
       router.refresh()
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to apply')
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<{ error?: string }>
+      setError(axiosErr.response?.data?.error || 'Failed to apply')
     } finally {
       setLoading(false)
     }

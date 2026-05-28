@@ -6,9 +6,21 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/utils/auth'
 import connectDB from '@/lib/db'
 import Application from '@/models/Application'
-import Job from '@/models/Job'
-import Company from '@/models/Company'
 import Link from 'next/link'
+
+type SeekerApplication = {
+  _id: { toString: () => string }
+  status: string
+  createdAt: Date | string
+  coverLetter?: string
+  jobId?: {
+    title?: string
+    location?: string
+    type?: string
+    salary?: { min?: number; max?: number }
+  }
+  companyId?: { name?: string }
+}
 
 export default async function ApplicationsPage() {
   const session = await getServerSession(authOptions)
@@ -35,6 +47,7 @@ export default async function ApplicationsPage() {
     hired:     '✅',
     rejected:  '❌',
   }
+  const typedApplications = applications as unknown as SeekerApplication[]
 
   return (
     <div className="space-y-5">
@@ -54,10 +67,10 @@ export default async function ApplicationsPage() {
       </div>
 
       {/* Stats bar */}
-      {applications.length > 0 && (
+      {typedApplications.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {['applied', 'reviewed', 'interview', 'hired', 'rejected'].map(s => {
-            const count = applications.filter((a: any) => a.status === s).length
+            const count = typedApplications.filter(a => a.status === s).length
             return (
               <div key={s} className={`px-4 py-3 rounded-xl text-center ${statusColors[s]}`}>
                 <p className="text-lg font-bold">{count}</p>
@@ -69,7 +82,7 @@ export default async function ApplicationsPage() {
       )}
 
       {/* List */}
-      {applications.length === 0 ? (
+      {typedApplications.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#c7c4d8] p-16 text-center">
           <p className="text-5xl mb-4">📭</p>
           <h2 className="text-lg font-semibold text-[#0b1c30] mb-2">No applications yet</h2>
@@ -83,7 +96,7 @@ export default async function ApplicationsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {applications.map((app: any) => (
+          {typedApplications.map(app => (
             <div
               key={app._id.toString()}
               className="bg-white rounded-xl border border-[#c7c4d8] p-5 hover:border-[#3525cd]/30 transition-colors"

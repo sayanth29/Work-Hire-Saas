@@ -26,6 +26,9 @@ const ApplicationSchema = new Schema<IApplicationDocument>(
   { timestamps: true }
 )
 
+// Prevent duplicate applications on concurrent clicks/race conditions.
+ApplicationSchema.index({ jobId: 1, seekerId: 1 }, { unique: true })
+
 const Application: Model<IApplicationDocument> =
   mongoose.models.Application ||
   mongoose.model<IApplicationDocument>('Application', ApplicationSchema)

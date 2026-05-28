@@ -6,7 +6,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/utils/auth'
 import connectDB from '@/lib/db'
 import Job from '@/models/Job'
-import Company from '@/models/Company'
 import Application from '@/models/Application'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -17,11 +16,36 @@ interface Props {
   params: Promise<{ id: string }> 
 }
 
+type JobDetail = {
+  _id: { toString: () => string }
+  title: string
+  description: string
+  status: string
+  type: string
+  location?: string
+  experience?: string
+  applicantCount: number
+  createdAt?: Date | string
+  deadline?: Date | string
+  requirements?: string[]
+  skills?: string[]
+  salary?: { min?: number; max?: number; currency?: string }
+  companyId?: {
+    name?: string
+    logo?: string
+    location?: string
+    industry?: string
+    website?: string
+    description?: string
+    size?: string
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   await connectDB()
   const { id } = await params
   try {
-    const job = await Job.findById(id).populate('companyId', 'name').lean() as any
+    const job = await Job.findById(id).populate('companyId', 'name').lean() as unknown as JobDetail | null
     if (!job || job.status !== 'active') {
       return {
         title: 'Job Not Found | WorkHire',
@@ -45,7 +69,7 @@ export default async function JobDetailPage({ params }: Props) {
 
   const job = await Job.findById(jobId)
     .populate('companyId', 'name logo location industry website description size')
-    .lean() as any
+    .lean() as unknown as JobDetail | null
 
   if (!job || job.status !== 'active') notFound()
 
@@ -180,11 +204,11 @@ export default async function JobDetailPage({ params }: Props) {
             </div>
 
             {/* Requirements */}
-            {job.requirements?.length > 0 && (
+            {(job.requirements?.length ?? 0) > 0 && (
               <div className="bg-white rounded-xl border border-[#c7c4d8] p-6">
                 <h2 className="font-semibold text-[#0b1c30] mb-4">Requirements</h2>
                 <ul className="space-y-2">
-                  {job.requirements.map((req: string, i: number) => (
+                  {(job.requirements ?? []).map((req: string, i: number) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-[#464555]">
                       <span className="text-[#3525cd] mt-0.5 shrink-0">✓</span>
                       {req}
@@ -195,11 +219,11 @@ export default async function JobDetailPage({ params }: Props) {
             )}
 
             {/* Skills */}
-            {job.skills?.length > 0 && (
+            {(job.skills?.length ?? 0) > 0 && (
               <div className="bg-white rounded-xl border border-[#c7c4d8] p-6">
                 <h2 className="font-semibold text-[#0b1c30] mb-4">Required Skills</h2>
                 <div className="flex flex-wrap gap-2">
-                  {job.skills.map((skill: string) => (
+                  {(job.skills ?? []).map((skill: string) => (
                     <span key={skill} className="px-3 py-1.5 rounded-xl bg-[#e2dfff] text-[#3525cd] text-sm font-medium">
                       {skill}
                     </span>

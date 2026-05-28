@@ -11,6 +11,7 @@ import Job from '@/models/Job'
 import Company from '@/models/Company'
 import { sendEmail, statusChangedTemplate } from '@/utils/sendEmail'
 import { createNotification } from '@/utils/notification'
+import mongoose from 'mongoose'
 
 interface Params { params: Promise<{ id: string }> }
 
@@ -24,6 +25,20 @@ export async function PUT(req: NextRequest, { params }: Params) {
     await connectDB()
 
     const { status, note } = await req.json()
+    const allowedStatuses = ['reviewed', 'interview', 'hired', 'rejected'] as const
+    if (!allowedStatuses.includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    }
+    if (note && typeof note !== 'string') {
+      return NextResponse.json({ error: 'Invalid note format' }, { status: 400 })
+    }
+    if (typeof note === 'string' && note.length > 2000) {
+      return NextResponse.json({ error: 'Note too long' }, { status: 400 })
+    }
+    const applicationId = (await params).id
+    if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+      return NextResponse.json({ error: 'Invalid application id' }, { status: 400 })
+    }
 
     const company     = await Company.findOne({ ownerId: session.user.id })
     if (!company) {
@@ -34,7 +49,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     }
 
     const application = await Application.findOne({
-      _id:       (await params).id,
+      _id:       applicationId,
       companyId: company._id,
     })
 

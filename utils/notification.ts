@@ -1,6 +1,7 @@
 import connectDB from '@/lib/db'
 import Notification from '@/models/Notification'
 import { NotificationType } from '@/types'
+import mongoose from 'mongoose'
 
 export async function createNotification({
   userId,
@@ -8,7 +9,7 @@ export async function createNotification({
   message,
   link,
 }: {
-  userId: string | any
+  userId: string | mongoose.Types.ObjectId
   type: NotificationType
   message: string
   link?: string

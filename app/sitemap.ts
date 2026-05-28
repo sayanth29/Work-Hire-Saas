@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Fetch all active jobs to populate in sitemap
     const jobs = await Job.find({ status: 'active' })
       .select('_id updatedAt')
-      .lean() as any[]
+      .lean()
     
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://workhire.com'
     

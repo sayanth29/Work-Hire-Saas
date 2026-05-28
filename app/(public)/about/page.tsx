@@ -9,7 +9,6 @@ import {
   Compass, 
   Eye, 
   ShieldCheck, 
-  Users, 
   Globe, 
   MapPin, 
   Heart,

@@ -7,21 +7,37 @@ import { authOptions } from '@/utils/auth'
 import connectDB from '@/lib/db'
 import Company from '@/models/Company'
 import Application from '@/models/Application'
-import User from '@/models/User'
-import Job from '@/models/Job'
 import ApplicantActions from '@/components/applications/ApplicantActions'
 
 interface Props {
   searchParams: { jobId?: string; status?: string }
 }
 
+type ApplicantRow = {
+  _id: { toString: () => string }
+  status: string
+  createdAt: Date | string
+  coverLetter?: string
+  seekerId?: {
+    _id?: { toString: () => string }
+    name?: string
+    email?: string
+    skills?: string[]
+    resume?: string
+  }
+  jobId?: {
+    title?: string
+  }
+}
+
 export default async function ApplicantsPage({ searchParams }: Props) {
   const session = await getServerSession(authOptions)
   await connectDB()
 
-  const company = await Company.findOne({ ownerId: session?.user.id }).lean() as any
+  const company = await Company.findOne({ ownerId: session?.user.id }).lean()
+  if (!company) return null
 
-  const filter: any = { companyId: company._id }
+  const filter: Record<string, unknown> = { companyId: company._id }
   if (searchParams.jobId)  filter.jobId  = searchParams.jobId
   if (searchParams.status) filter.status = searchParams.status
 
@@ -39,13 +55,15 @@ export default async function ApplicantsPage({ searchParams }: Props) {
     rejected:  'bg-[#ffdad6] text-[#93000a]',
   }
 
+  const typedApplications = applications as unknown as ApplicantRow[]
+
   const counts = {
-    all:       applications.length,
-    applied:   applications.filter((a: any) => a.status === 'applied').length,
-    reviewed:  applications.filter((a: any) => a.status === 'reviewed').length,
-    interview: applications.filter((a: any) => a.status === 'interview').length,
-    hired:     applications.filter((a: any) => a.status === 'hired').length,
-    rejected:  applications.filter((a: any) => a.status === 'rejected').length,
+    all:       typedApplications.length,
+    applied:   typedApplications.filter(a => a.status === 'applied').length,
+    reviewed:  typedApplications.filter(a => a.status === 'reviewed').length,
+    interview: typedApplications.filter(a => a.status === 'interview').length,
+    hired:     typedApplications.filter(a => a.status === 'hired').length,
+    rejected:  typedApplications.filter(a => a.status === 'rejected').length,
   }
 
   return (
@@ -78,7 +96,7 @@ export default async function ApplicantsPage({ searchParams }: Props) {
       </div>
 
       {/* List */}
-      {applications.length === 0 ? (
+      {typedApplications.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#c7c4d8] p-16 text-center">
           <p className="text-5xl mb-4">👥</p>
           <h2 className="text-lg font-semibold text-[#0b1c30] mb-2">No applicants yet</h2>
@@ -86,7 +104,7 @@ export default async function ApplicantsPage({ searchParams }: Props) {
         </div>
       ) : (
         <div className="space-y-3">
-          {applications.map((app: any) => (
+          {typedApplications.map(app => (
             <div key={app._id.toString()} className="bg-white rounded-xl border border-[#c7c4d8] p-5 hover:border-[#3525cd]/30 transition-colors">
               <div className="flex items-start gap-4">
 
@@ -113,9 +131,9 @@ export default async function ApplicantsPage({ searchParams }: Props) {
                   </div>
 
                   {/* Skills */}
-                  {app.seekerId?.skills?.length > 0 && (
+                  {(app.seekerId?.skills?.length ?? 0) > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
-                      {app.seekerId.skills.slice(0, 5).map((skill: string) => (
+                      {(app.seekerId?.skills ?? []).slice(0, 5).map((skill: string) => (
                         <span key={skill} className="px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] text-xs">
                           {skill}
                         </span>
@@ -126,7 +144,7 @@ export default async function ApplicantsPage({ searchParams }: Props) {
                   {/* Cover letter */}
                   {app.coverLetter && (
                     <p className="text-xs text-[#464555] mt-2 line-clamp-2 bg-[#f8f9ff] rounded-lg p-2">
-                      "{app.coverLetter}"
+                      &quot;{app.coverLetter}&quot;
                     </p>
                   )}
 

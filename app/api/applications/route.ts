@@ -9,6 +9,8 @@ import Application from '@/models/Application'
 import Job from '@/models/Job'
 import User from '@/models/User'
 import Company from '@/models/Company'
+import mongoose from 'mongoose'
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 import {
   sendEmail,
   applicationReceivedTemplate,
@@ -17,6 +19,15 @@ import { createNotification } from '@/utils/notification'
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req.headers)
+    const limit = checkRateLimit(`apply:${ip}`, 20, 60_000)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again shortly.' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSec) } }
+      )
+    }
+
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -29,8 +40,14 @@ export async function POST(req: NextRequest) {
 
     const { jobId, coverLetter } = await req.json()
 
-    if (!jobId) {
+    if (!jobId || !mongoose.Types.ObjectId.isValid(jobId)) {
       return NextResponse.json({ error: 'Job ID required' }, { status: 400 })
+    }
+    if (coverLetter && typeof coverLetter !== 'string') {
+      return NextResponse.json({ error: 'Invalid cover letter format' }, { status: 400 })
+    }
+    if (typeof coverLetter === 'string' && coverLetter.length > 5000) {
+      return NextResponse.json({ error: 'Cover letter too long' }, { status: 400 })
     }
 
     // Check job exists
@@ -45,15 +62,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Company is not approved or active' }, { status: 403 })
     }
 
-    // Check already applied
-    const existing = await Application.findOne({
-      jobId,
-      seekerId: session.user.id,
-    })
-    if (existing) {
-      return NextResponse.json({ error: 'Already applied to this job' }, { status: 400 })
-    }
-
     // Check seeker has resume
     const seeker = await User.findById(session.user.id)
     if (!seeker?.resume) {
@@ -64,13 +72,26 @@ export async function POST(req: NextRequest) {
     }
 
     // Create application
-    const application = await Application.create({
-      jobId,
-      seekerId:  session.user.id,
-      companyId: job.companyId,
-      resume:    seeker.resume,
-      coverLetter,
-    })
+    let application
+    try {
+      application = await Application.create({
+        jobId,
+        seekerId:  session.user.id,
+        companyId: job.companyId,
+        resume:    seeker.resume,
+        coverLetter: typeof coverLetter === 'string' ? coverLetter.trim() : undefined,
+      })
+    } catch (createError: unknown) {
+      if (
+        typeof createError === 'object' &&
+        createError !== null &&
+        'code' in createError &&
+        (createError as { code?: number }).code === 11000
+      ) {
+        return NextResponse.json({ error: 'Already applied to this job' }, { status: 409 })
+      }
+      throw createError
+    }
 
     // Increment job applicant count
     await Job.findByIdAndUpdate(jobId, {

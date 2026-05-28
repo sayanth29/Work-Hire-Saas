@@ -8,9 +8,19 @@ import {
   verifyEmailTemplate,
   companyVerifyEmailTemplate,
 } from '@/utils/sendEmail'
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req.headers)
+    const limit = checkRateLimit(`auth-resend:${ip}`, 8, 60_000)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many resend requests. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfterSec) } }
+      )
+    }
+
     await connectDB()
 
     const { email } = await req.json()

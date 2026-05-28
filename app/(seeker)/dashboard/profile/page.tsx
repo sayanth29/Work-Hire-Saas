@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
+import type { AxiosError } from 'axios'
 
 interface Experience {
   _id?: string
@@ -86,8 +87,9 @@ export default function ProfilePage() {
       })
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to save')
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<{ error?: string }>
+      setError(axiosErr.response?.data?.error || 'Failed to save')
     } finally {
       setSaving(false)
     }
@@ -125,7 +127,7 @@ export default function ProfilePage() {
     }])
   }
 
-  function updateExp(i: number, field: string, value: any) {
+  function updateExp<K extends keyof Experience>(i: number, field: K, value: Experience[K]) {
     const updated = [...experience]
     updated[i] = { ...updated[i], [field]: value }
     setExperience(updated)

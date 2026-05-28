@@ -1,7 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import fs from 'fs'
+import path from 'path'
+import mongoose from 'mongoose'
+import bcrypt from 'bcryptjs'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // ── Load Environment Variables ──
 let MONGODB_URI = '';

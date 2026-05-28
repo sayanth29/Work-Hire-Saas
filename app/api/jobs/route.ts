@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const approvedCompanies = await Company.find({ isAdminApproved: true }).select('_id').lean()
     const approvedCompanyIds = approvedCompanies.map(c => c._id)
 
-    const filter: any = { status: 'active', companyId: { $in: approvedCompanyIds } }
+    const filter: Record<string, unknown> = { status: 'active', companyId: { $in: approvedCompanyIds } }
     if (searchParams.get('type'))     filter.type     = searchParams.get('type')
     if (searchParams.get('location')) filter.location = new RegExp(searchParams.get('location')!, 'i')
     if (searchParams.get('search'))   filter.title    = new RegExp(searchParams.get('search')!, 'i')

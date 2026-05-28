@@ -26,7 +26,7 @@ export default async function RecruiterLayout({
   await connectDB()
 
   // Get company info
-  const company = await Company.findOne({ ownerId: session.user.id }).lean() as any
+  const company = await Company.findOne({ ownerId: session.user.id }).lean()
 
   // Not verified or not approved yet
   if (!company) redirect('/login')

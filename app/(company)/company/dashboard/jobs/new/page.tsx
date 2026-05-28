@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
+import type { AxiosError } from 'axios'
 
 export default function NewJobPage() {
   const router = useRouter()
@@ -52,8 +53,9 @@ export default function NewJobPage() {
         status:        form.status,
       })
       router.push('/company/dashboard/jobs')
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to post job')
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<{ error?: string }>
+      setError(axiosErr.response?.data?.error || 'Failed to post job')
     } finally {
       setLoading(false)
     }

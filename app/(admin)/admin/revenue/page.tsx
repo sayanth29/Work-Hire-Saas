@@ -11,10 +11,8 @@ import {
   DollarSign, 
   Users, 
   TrendingUp, 
-  ShieldCheck, 
   Calendar,
-  Building,
-  ArrowUpRight
+  Building
 } from 'lucide-react'
 
 const PLAN_PRICES = {
@@ -44,7 +42,7 @@ export default async function AdminRevenuePage() {
   let enterpriseCount = 0
   let activeSubCount = 0
 
-  paidCompanies.forEach((company: any) => {
+  paidCompanies.forEach(company => {
     const plan = company.subscription?.plan as 'pro' | 'enterprise'
     const status = company.subscription?.status
 
@@ -148,7 +146,7 @@ export default async function AdminRevenuePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {(paidCompanies as any[]).map(company => {
+              {paidCompanies.map(company => {
                 const plan = company.subscription?.plan || 'free'
                 const status = company.subscription?.status || 'inactive'
                 const currentPeriodEnd = company.subscription?.currentPeriodEnd

@@ -13,7 +13,8 @@ export default async function ManageJobsPage() {
   const session = await getServerSession(authOptions)
   await connectDB()
 
-  const company = await Company.findOne({ ownerId: session?.user.id }).lean() as any
+  const company = await Company.findOne({ ownerId: session?.user.id }).lean()
+  if (!company) return null
   const jobs    = await Job.find({ companyId: company._id })
     .sort({ createdAt: -1 })
     .lean()
@@ -50,7 +51,7 @@ export default async function ManageJobsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {jobs.map((job: any) => (
+          {jobs.map(job => (
             <div key={job._id.toString()} className="bg-white rounded-xl border border-[#c7c4d8] p-5 hover:border-[#3525cd]/30 transition-colors">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">

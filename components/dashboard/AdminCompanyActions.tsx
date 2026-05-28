@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import { CheckCircle2, XCircle, Check, X, AlertTriangle } from 'lucide-react'
+import { CheckCircle2, Check, X } from 'lucide-react'
 
 interface Props {
   companyId:    string

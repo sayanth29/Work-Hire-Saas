@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import axios from 'axios'
+import type { AxiosError } from 'axios'
 
 type Role = 'jobseeker' | 'recruiter'
 
@@ -105,7 +105,6 @@ const benefits = [
 ]
 
 export default function RegisterPage() {
-  const router = useRouter()
   const [role, setRole] = useState<Role>('jobseeker')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -134,8 +133,9 @@ export default function RegisterPage() {
 
       const { data } = await axios.post('/api/auth/register', payload)
       setSuccess(data.message)
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Something went wrong')
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<{ error?: string }>
+      setError(axiosErr.response?.data?.error || 'Something went wrong')
     } finally {
       setLoading(false)
     }

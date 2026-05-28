@@ -20,7 +20,6 @@ export default function ApplicantActions({
   applicationId,
   currentStatus,
   seekerId,
-  seekerName,
 }: Props) {
   const router = useRouter()
   const [updating, setUpdating] = useState(false)

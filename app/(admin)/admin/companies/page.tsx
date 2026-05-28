@@ -27,7 +27,7 @@ export default async function AdminCompaniesPage() {
       </div>
 
       <div className="space-y-4">
-        {(companies as any[]).map(company => (
+        {companies.map(company => (
           <div 
             key={company._id.toString()} 
             className="premium-card p-5 rounded-2xl group hover:shadow-[0_4px_25px_rgba(0,0,0,0.015)] relative overflow-hidden"

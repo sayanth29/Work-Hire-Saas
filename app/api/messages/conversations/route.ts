@@ -8,8 +8,21 @@ import connectDB from '@/lib/db'
 import Message from '@/models/Message'
 import Application from '@/models/Application'
 import User from '@/models/User'
-import Job from '@/models/Job'
 import Company from '@/models/Company'
+import mongoose from 'mongoose'
+
+type ConversationItem = {
+  applicationId: string
+  userId: string
+  lastMessage: string
+  unread: number
+  createdAt: Date
+}
+
+type PopulatedApplication = {
+  jobId?: { title?: string }
+  companyId?: { name?: string }
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,7 +44,7 @@ export async function GET(req: NextRequest) {
     .lean()
 
     // Group by applicationId
-    const convMap = new Map<string, any>()
+    const convMap = new Map<string, ConversationItem>()
 
     for (const msg of messages) {
       const appId    = msg.applicationId?.toString() || 'direct'
@@ -54,7 +67,8 @@ export async function GET(req: NextRequest) {
         msg.receiverId.toString() === session.user.id &&
         !msg.read
       ) {
-        convMap.get(appId).unread++
+        const conversation = convMap.get(appId)
+        if (conversation) conversation.unread += 1
       }
     }
 
@@ -63,14 +77,35 @@ export async function GET(req: NextRequest) {
     const queryUserId = searchParams.get('userId')
     const queryAppId = searchParams.get('applicationId') || 'direct'
 
-    if (queryUserId && queryUserId !== session.user.id && !convMap.has(queryAppId)) {
-      convMap.set(queryAppId, {
-        applicationId: queryAppId,
-        userId:        queryUserId,
-        lastMessage:   '',
-        unread:        0,
-        createdAt:     new Date(),
-      })
+    if (
+      queryUserId &&
+      mongoose.Types.ObjectId.isValid(queryUserId) &&
+      queryUserId !== session.user.id &&
+      !convMap.has(queryAppId)
+    ) {
+      let canCreate = false
+      if (queryAppId !== 'direct' && mongoose.Types.ObjectId.isValid(queryAppId)) {
+        const app = await Application.findById(queryAppId).select('seekerId companyId').lean()
+        if (app) {
+          const company = await Company.findById(app.companyId).select('ownerId').lean()
+          const seekerId = app.seekerId.toString()
+          const recruiterId = company?.ownerId?.toString() || ''
+          const me = session.user.id
+          canCreate =
+            (me === seekerId && queryUserId === recruiterId) ||
+            (me === recruiterId && queryUserId === seekerId)
+        }
+      }
+
+      if (canCreate) {
+        convMap.set(queryAppId, {
+          applicationId: queryAppId,
+          userId:        queryUserId,
+          lastMessage:   '',
+          unread:        0,
+          createdAt:     new Date(),
+        })
+      }
     }
 
     // Enrich with user + job info
@@ -78,7 +113,7 @@ export async function GET(req: NextRequest) {
       Array.from(convMap.values()).map(async conv => {
         const otherUser = await User.findById(conv.userId)
           .select('name avatar')
-          .lean() as any
+          .lean()
 
         let jobTitle    = ''
         let companyName = ''
@@ -87,7 +122,7 @@ export async function GET(req: NextRequest) {
           const app = await Application.findById(conv.applicationId)
             .populate('jobId', 'title')
             .populate('companyId', 'name')
-            .lean() as any
+            .lean() as unknown as PopulatedApplication | null
 
           jobTitle    = app?.jobId?.title    || ''
           companyName = app?.companyId?.name || ''

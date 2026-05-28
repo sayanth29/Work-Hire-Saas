@@ -8,7 +8,6 @@ import connectDB from '@/lib/db'
 import Company from '@/models/Company'
 import Job from '@/models/Job'
 import Application from '@/models/Application'
-import User from '@/models/User'
 import Link from 'next/link'
 import { PLAN_LIMITS } from '@/types'
 import { 
@@ -23,11 +22,26 @@ import {
   AlertCircle
 } from 'lucide-react'
 
+type RecentApp = {
+  _id: { toString: () => string }
+  status: string
+  createdAt: Date | string
+  seekerId?: { name?: string }
+  jobId?: { title?: string }
+}
+
+type RecentJob = {
+  _id: { toString: () => string }
+  title: string
+  status: string
+  applicantCount?: number
+}
+
 export default async function RecruiterDashboardPage() {
   const session = await getServerSession(authOptions)
   await connectDB()
 
-  const company = await Company.findOne({ ownerId: session?.user.id }).lean() as any
+  const company = await Company.findOne({ ownerId: session?.user.id }).lean()
   if (!company) return null
 
   const plan      = company.subscription?.plan || 'free'
@@ -37,10 +51,12 @@ export default async function RecruiterDashboardPage() {
   const totalJobs   = await Job.countDocuments({ companyId: company._id })
   const activeJobs  = await Job.countDocuments({ companyId: company._id, status: 'active' })
   const totalApps   = await Application.countDocuments({ companyId: company._id })
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
   const newApps     = await Application.countDocuments({
     companyId: company._id,
     status: 'applied',
-    createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+    createdAt: { $gte: sevenDaysAgo }
   })
   const interviews  = await Application.countDocuments({ companyId: company._id, status: 'interview' })
   const hired       = await Application.countDocuments({ companyId: company._id, status: 'hired' })
@@ -58,6 +74,8 @@ export default async function RecruiterDashboardPage() {
     .sort({ createdAt: -1 })
     .limit(4)
     .lean()
+  const typedRecentApps = recentApps as unknown as RecentApp[]
+  const typedRecentJobs = recentJobs as unknown as RecentJob[]
 
   const stats = [
     { label: 'Active Jobs',      value: activeJobs, icon: Briefcase,    color: 'bg-primary/10 text-primary border-primary/20', sub: `${totalJobs} total` },
@@ -174,7 +192,7 @@ export default async function RecruiterDashboardPage() {
               </Link>
             </div>
 
-            {recentApps.length === 0 ? (
+            {typedRecentApps.length === 0 ? (
               <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl">
                 <span className="text-3xl inline-block mb-3">📭</span>
                 <p className="text-sm font-semibold text-muted">No applications received yet</p>
@@ -190,7 +208,7 @@ export default async function RecruiterDashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {recentApps.map((app: any) => (
+                {typedRecentApps.map(app => (
                   <div 
                     key={app._id.toString()} 
                     className="flex items-center justify-between p-3.5 rounded-2xl border border-slate-100 hover:border-primary/10 hover:bg-slate-50/40 transition-all duration-200 group"
@@ -259,13 +277,13 @@ export default async function RecruiterDashboardPage() {
               </Link>
             </div>
             
-            {recentJobs.length === 0 ? (
+            {typedRecentJobs.length === 0 ? (
               <div className="text-center py-6 border border-dashed border-slate-100 rounded-xl">
                 <p className="text-xs text-muted">No jobs published yet</p>
               </div>
             ) : (
               <div className="space-y-2">
-                {recentJobs.map((job: any) => (
+                {typedRecentJobs.map(job => (
                   <Link
                     key={job._id.toString()}
                     href={`/company/dashboard/jobs/${job._id}`}

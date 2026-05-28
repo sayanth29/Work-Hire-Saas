@@ -5,7 +5,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import LandingHeader from '@/components/LandingHeader'
-import { Shield, Eye, Lock, FileText, CheckCircle2 } from 'lucide-react'
+import { Shield, Lock, FileText, CheckCircle2 } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy — Data Protection | WorkHire',
