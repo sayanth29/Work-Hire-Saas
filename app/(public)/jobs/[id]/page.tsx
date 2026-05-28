@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/utils/auth'
 import connectDB from '@/lib/db'
 import Job from '@/models/Job'
+import '@/models/Company' // register Company schema for populate
 import Application from '@/models/Application'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'

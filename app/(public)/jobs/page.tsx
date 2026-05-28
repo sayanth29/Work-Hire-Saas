@@ -4,6 +4,7 @@
 
 import connectDB from '@/lib/db'
 import Job from '@/models/Job'
+import '@/models/Company' // register Company schema for populate
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { 

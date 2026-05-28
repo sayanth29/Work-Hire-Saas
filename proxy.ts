@@ -30,9 +30,18 @@ export default withAuth(
     callbacks: {
       authorized: ({ token }) => !!token,
     },
+    pages: {
+      signIn: '/login',
+    },
   }
 )
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/company/dashboard/:path*', '/admin/:path*'],
+  matcher: [
+    '/dashboard/:path*',
+    '/company/dashboard/:path*',
+    '/admin/:path*',
+    '/jobs',
+    '/jobs/:path*',
+  ],
 }
