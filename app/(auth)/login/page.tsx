@@ -82,9 +82,41 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const [resending, setResending] = useState(false)
+  const [resendSuccess, setResendSuccess] = useState(false)
+  const [resendError, setResendError] = useState('')
+
+  async function handleResendVerification() {
+    if (!email) return
+    setResending(true)
+    setResendSuccess(false)
+    setResendError('')
+
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setResendSuccess(true)
+        setError('') // Clear original login verification error
+      } else {
+        setResendError(data.error || 'Failed to resend verification email.')
+      }
+    } catch (err) {
+      setResendError('Something went wrong. Please try again.')
+    } finally {
+      setResending(false)
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setResendSuccess(false)
+    setResendError('')
     setLoading(true)
 
     const result = await signIn('credentials', {
@@ -269,13 +301,51 @@ export default function LoginPage() {
 
             {/* Error */}
             {error && (
+              <div className="mb-5 px-4 py-3 rounded-xl bg-error-bg border border-error/15 text-error text-sm animate-fade-in space-y-2">
+                <div className="flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" x2="12" y1="8" y2="12" />
+                    <line x1="12" x2="12.01" y1="16" y2="16" />
+                  </svg>
+                  <span>{error}</span>
+                </div>
+                {error === 'Please verify your email first' && email && (
+                  <div className="pt-1.5 border-t border-error/10 flex items-center justify-between gap-2 text-[12px]">
+                    <span className="text-error/70">Didn&apos;t receive it?</span>
+                    <button
+                      type="button"
+                      disabled={resending}
+                      onClick={handleResendVerification}
+                      className="font-semibold text-primary hover:text-primary-dark disabled:opacity-60 transition-colors cursor-pointer"
+                    >
+                      {resending ? 'Sending...' : 'Resend verification link'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Resend Success */}
+            {resendSuccess && (
+              <div className="mb-5 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-500/15 text-emerald-800 text-sm flex items-center gap-2 animate-fade-in">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500 shrink-0">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <path d="m9 11 3 3L22 4" />
+                </svg>
+                <span>Verification email sent! Check your inbox.</span>
+              </div>
+            )}
+
+            {/* Resend Error */}
+            {resendError && (
               <div className="mb-5 px-4 py-3 rounded-xl bg-error-bg border border-error/15 text-error text-sm flex items-center gap-2 animate-fade-in">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                   <circle cx="12" cy="12" r="10" />
                   <line x1="12" x2="12" y1="8" y2="12" />
                   <line x1="12" x2="12.01" y1="16" y2="16" />
                 </svg>
-                {error}
+                <span>{resendError}</span>
               </div>
             )}
 
