@@ -21,8 +21,8 @@ export interface ICompanyDocument extends Document {
   subscription: {
     plan: SubscriptionPlan
     status: SubscriptionStatus
-    razorpayCustomerId?: string
-    razorpaySubscriptionId?: string
+    stripeCustomerId?: string
+    stripeSubscriptionId?: string
     currentPeriodEnd?: Date
   }
   createdAt: Date
@@ -54,8 +54,8 @@ const CompanySchema = new Schema<ICompanyDocument>(
     subscription: {
       plan:   { type: String, enum: ['free', 'pro', 'enterprise'], default: 'free' },
       status: { type: String, enum: ['active', 'cancelled', 'past_due', 'inactive'], default: 'inactive' },
-      razorpayCustomerId:     String,
-      razorpaySubscriptionId: String,
+      stripeCustomerId:     String,
+      stripeSubscriptionId: String,
       currentPeriodEnd:       Date,
     },
   },

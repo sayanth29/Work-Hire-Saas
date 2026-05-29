@@ -140,7 +140,7 @@ export default async function AdminRevenuePage() {
               <tr className="border-b border-slate-100 text-[10px] font-extrabold text-muted uppercase tracking-wider">
                 <th className="pb-3 font-semibold">Company</th>
                 <th className="pb-3 font-semibold">Subscription Plan</th>
-                <th className="pb-3 font-semibold">Razorpay Subscription</th>
+                <th className="pb-3 font-semibold">Stripe Subscription</th>
                 <th className="pb-3 font-semibold">Billing End Date</th>
                 <th className="pb-3 font-semibold">Status</th>
               </tr>
@@ -174,9 +174,9 @@ export default async function AdminRevenuePage() {
                       </span>
                     </td>
 
-                    {/* Razorpay Subscription ID */}
+                    {/* Stripe Subscription ID */}
                     <td className="py-4 pr-3 font-mono text-[10px] text-muted">
-                      {company.subscription?.razorpaySubscriptionId || 'N/A'}
+                      {company.subscription?.stripeSubscriptionId || 'N/A'}
                     </td>
 
                     {/* Billing End */}

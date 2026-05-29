@@ -15,7 +15,9 @@ import {
   Search, 
   LogOut,
   Menu,
-  X
+  X,
+  Sparkles,
+  FileText
 } from 'lucide-react'
 
 interface Props {
@@ -31,6 +33,8 @@ const navItems = [
   { href: '/dashboard/profile',      icon: User,            label: 'My Profile'    },
   { href: '/dashboard/applications', icon: ClipboardList,   label: 'Applications'  },
   { href: '/dashboard/messages',     icon: MessageSquare,   label: 'Messages'      },
+  { href: '/dashboard/resume-analyzer', icon: Sparkles,     label: 'AI Resume Analyzer' },
+  { href: '/dashboard/cover-letter', icon: FileText,        label: 'AI Cover Letter' },
   { href: '/jobs',                   icon: Search,          label: 'Browse Jobs'   },
 ]
 

@@ -4,27 +4,9 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import type { AxiosError } from 'axios'
-
-type RazorpayResponse = {
-  razorpay_order_id: string
-  razorpay_payment_id: string
-  razorpay_signature: string
-}
-
-type RazorpayOptions = {
-  key: string | undefined
-  amount: number
-  currency: string
-  name: string
-  description: string
-  order_id: string
-  handler: (response: RazorpayResponse) => Promise<void>
-  prefill: { name: string; email: string }
-  theme: { color: string }
-}
 
 const plans = [
   {
@@ -76,53 +58,66 @@ export default function BillingPage() {
   const [loading, setLoading] = useState<string | null>(null)
   const [currentPlan, setCurrentPlan] = useState('free')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  // 1. Fetch current company plan on mount
+  useEffect(() => {
+    async function getCompanyPlan() {
+      try {
+        const { data } = await axios.get('/api/companies/mine')
+        if (data.plan) {
+          setCurrentPlan(data.plan)
+        }
+      } catch (err) {
+        console.error('Failed to load company plan info:', err)
+      }
+    }
+    getCompanyPlan()
+  }, [])
+
+  // 2. Handle Stripe success redirect parameters in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const sessionId = params.get('session_id')
+    const planParam = params.get('plan')
+
+    if (sessionId && planParam) {
+      setError('')
+      setLoading(planParam)
+      axios.post('/api/stripe/verify-session', { sessionId, plan: planParam })
+        .then((res) => {
+          setCurrentPlan(planParam)
+          setSuccess(`Plan successfully upgraded to ${planParam.toUpperCase()}!`)
+          // Remove query params to prevent re-submitting on refresh
+          const newUrl = window.location.pathname
+          window.history.replaceState({}, document.title, newUrl)
+        })
+        .catch((err) => {
+          const axiosErr = err as AxiosError<{ error?: string }>
+          setError(axiosErr.response?.data?.error || 'Payment verification failed.')
+        })
+        .finally(() => {
+          setLoading(null)
+        })
+    }
+  }, [])
 
   async function handleUpgrade(plan: string) {
     if (plan === 'free') return
     setError('')
+    setSuccess('')
     setLoading(plan)
     try {
-      const { data } = await axios.post('/api/razorpay/create-order', { plan })
-
-      // Load Razorpay script
-      const script = document.createElement('script')
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-      document.body.appendChild(script)
-
-      script.onload = () => {
-        const options = {
-          key:         process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          amount:      data.amount,
-          currency:    'INR',
-          name:        'WorkHire',
-          description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
-          order_id:    data.orderId,
-          handler:     async (response: RazorpayResponse) => {
-            try {
-              await axios.post('/api/razorpay/verify', {
-                razorpay_order_id:   response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature:  response.razorpay_signature,
-                plan,
-              })
-              setCurrentPlan(plan)
-              window.location.reload()
-            } catch {
-              setError('Payment verification failed. Contact support.')
-            }
-          },
-          prefill:  { name: '', email: '' },
-          theme:    { color: '#3525cd' },
-        }
-
-        const razorpayWindow = window as unknown as Window & { Razorpay: new (opts: RazorpayOptions) => { open: () => void } }
-        const rzp = new razorpayWindow.Razorpay(options)
-        rzp.open()
+      const { data } = await axios.post('/api/stripe/create-checkout-session', { plan })
+      if (data.url) {
+        // Redirect user to Stripe Checkout (or dev mock sandbox)
+        window.location.href = data.url
+      } else {
+        throw new Error('No checkout URL returned')
       }
     } catch (err: unknown) {
       const axiosErr = err as AxiosError<{ error?: string }>
-      setError(axiosErr.response?.data?.error || 'Failed to initiate payment')
-    } finally {
+      setError(axiosErr.response?.data?.error || 'Failed to initiate checkout session')
       setLoading(null)
     }
   }
@@ -157,6 +152,12 @@ export default function BillingPage() {
 
       {error && (
         <div className="px-4 py-3 rounded-xl bg-[#ffdad6] text-[#93000a] text-sm">{error}</div>
+      )}
+
+      {success && (
+        <div className="px-4 py-3 rounded-xl bg-[#ecfdf5] border border-emerald-200 text-emerald-700 text-sm font-semibold">
+          {success}
+        </div>
       )}
 
       {/* Plans */}
@@ -222,7 +223,7 @@ export default function BillingPage() {
         <h2 className="font-semibold text-[#0b1c30]">Frequently Asked Questions</h2>
         {[
           ['Can I cancel anytime?', 'Yes, you can cancel your subscription anytime. You will retain access until the end of your billing period.'],
-          ['What payment methods are accepted?', 'We accept credit/debit cards, UPI, net banking, and popular international and local payment methods via Razorpay.'],
+          ['What payment methods are accepted?', 'We accept all major credit/debit cards, Apple Pay, Google Pay, and other standard payment methods via Stripe.'],
           ['Is there a free trial?', 'The Free plan is available forever with limited features. No credit card required.'],
         ].map(([q, a]) => (
           <div key={q} className="border-b border-[#c7c4d8] pb-4 last:border-0 last:pb-0">

@@ -26,10 +26,12 @@ export default async function RecruiterLayout({
   await connectDB()
 
   // Get company info
-  const company = await Company.findOne({ ownerId: session.user.id }).lean()
+  const companyDoc = await Company.findOne({ ownerId: session.user.id }).lean()
 
   // Not verified or not approved yet
-  if (!company) redirect('/login')
+  if (!companyDoc) redirect('/login')
+
+  const company = JSON.parse(JSON.stringify(companyDoc))
 
   return (
     <div className="min-h-screen bg-[#fafbff] flex font-sans selection:bg-primary/20 selection:text-primary">

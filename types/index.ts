@@ -126,8 +126,8 @@ export interface IUser {
 export interface ISubscription {
   plan: SubscriptionPlan
   status: SubscriptionStatus
-  razorpayCustomerId?: string
-  razorpaySubscriptionId?: string
+  stripeCustomerId?: string
+  stripeSubscriptionId?: string
   currentPeriodEnd?: Date
 }
 
@@ -231,8 +231,8 @@ export const PLAN_LIMITS: Record<SubscriptionPlan, {
   enterprise: { jobLimit: Infinity, analytics: true,  chat: true  },
 }
 
-// ── Razorpay plan IDs ────────────────────────────
-export const RAZORPAY_PLAN_IDS: Record<string, SubscriptionPlan> = {
-  plan_pro_monthly:        'pro',
-  plan_enterprise_monthly: 'enterprise',
+// ── Stripe price/plan IDs ────────────────────────
+export const STRIPE_PLAN_IDS: Record<string, SubscriptionPlan> = {
+  price_pro_monthly:        'pro',
+  price_enterprise_monthly: 'enterprise',
 }

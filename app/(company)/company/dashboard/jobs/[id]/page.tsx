@@ -1,19 +1,27 @@
-// 📄 PAGE: Post New Job
-// 🌐 URL: /company/dashboard/jobs/new
+// 📄 PAGE: Edit Job Posting
+// 🌐 URL: /company/dashboard/jobs/[id]
 // 👤 WHO: Recruiters only
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import type { AxiosError } from 'axios'
 import AIJobDescription from '@/components/jobs/AIJobDescription'
 
-export default function NewJobPage() {
+interface EditJobPageProps {
+  params: Promise<{ id: string }>
+}
+
+export default function EditJobPage({ params }: EditJobPageProps) {
+  const { id } = use(params)
   const router = useRouter()
+  
   const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState('')
+  const [pageLoading, setPageLoading] = useState(true)
+  const [deleting, setDeleting] = useState(false)
+  const [error, setError] = useState('')
 
   const [form, setForm] = useState({
     title:       '',
@@ -29,6 +37,41 @@ export default function NewJobPage() {
     status:      'active',
   })
 
+  useEffect(() => {
+    async function loadJob() {
+      try {
+        const { data } = await axios.get(`/api/jobs/${id}`)
+        if (data?.job) {
+          const j = data.job
+          
+          let formattedDeadline = ''
+          if (j.deadline) {
+            formattedDeadline = new Date(j.deadline).toISOString().split('T')[0]
+          }
+
+          setForm({
+            title:       j.title       || '',
+            description: j.description || '',
+            location:    j.location    || '',
+            type:        j.type        || 'full-time',
+            experience:  j.experience  || 'fresher',
+            salaryMin:   j.salary?.min !== undefined ? String(j.salary.min) : '',
+            salaryMax:   j.salary?.max !== undefined ? String(j.salary.max) : '',
+            skills:      j.skills?.join(', ') || '',
+            requirements:j.requirements?.join('\n') || '',
+            deadline:    formattedDeadline,
+            status:      j.status      || 'active',
+          })
+        }
+      } catch (err) {
+        setError('Failed to load job details')
+      } finally {
+        setPageLoading(false)
+      }
+    }
+    loadJob()
+  }, [id])
+
   const update = (f: string, v: string) => setForm(p => ({ ...p, [f]: v }))
 
   async function handleSubmit(e: React.FormEvent) {
@@ -37,7 +80,7 @@ export default function NewJobPage() {
     setLoading(true)
 
     try {
-      await axios.post('/api/jobs', {
+      await axios.put(`/api/jobs/${id}`, {
         title:        form.title,
         description:  form.description,
         location:     form.location,
@@ -56,21 +99,54 @@ export default function NewJobPage() {
       router.push('/company/dashboard/jobs')
     } catch (err: unknown) {
       const axiosErr = err as AxiosError<{ error?: string }>
-      setError(axiosErr.response?.data?.error || 'Failed to post job')
+      setError(axiosErr.response?.data?.error || 'Failed to update job')
     } finally {
       setLoading(false)
     }
   }
 
+  async function handleDelete() {
+    if (!window.confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) return
+    
+    setError('')
+    setDeleting(true)
+
+    try {
+      await axios.delete(`/api/jobs/${id}`)
+      router.push('/company/dashboard/jobs')
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<{ error?: string }>
+      setError(axiosErr.response?.data?.error || 'Failed to delete job')
+      setDeleting(false)
+    }
+  }
+
   const inputCls = "w-full px-4 py-2.5 bg-[#f8f9ff] border border-[#c7c4d8] rounded-xl text-sm focus:outline-none focus:border-[#3525cd] focus:ring-1 focus:ring-[#3525cd] transition-all"
+
+  if (pageLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-4xl animate-pulse">⏳</div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-3xl space-y-5">
-
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-[#0b1c30]">Post New Job</h1>
-        <p className="text-sm text-[#777587]">Fill in the details to attract the right candidates</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-[#0b1c30]">Edit Job Posting</h1>
+          <p className="text-sm text-[#777587]">Update the details for your job posting</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={deleting}
+          className="px-4 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 text-xs font-semibold transition-all active:scale-[0.98]"
+        >
+          {deleting ? 'Deleting...' : '🗑 Delete Job'}
+        </button>
       </div>
 
       {error && (
@@ -78,7 +154,6 @@ export default function NewJobPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
-
         {/* Basic info */}
         <div className="bg-white rounded-xl border border-[#c7c4d8] p-6 space-y-4">
           <h2 className="font-semibold text-[#0b1c30]">Job Details</h2>
@@ -249,7 +324,7 @@ export default function NewJobPage() {
           <div className="flex gap-3">
             {[
               { value: 'active', label: '🚀 Publish Now',  desc: 'Visible to job seekers immediately' },
-              { value: 'draft',  label: '📝 Save as Draft', desc: 'Save and publish later' },
+              { value: 'draft',  label: '📝 Save as Draft', desc: 'Save and edit later' },
             ].map(({ value, label, desc }) => (
               <label
                 key={value}
@@ -288,18 +363,9 @@ export default function NewJobPage() {
             disabled={loading}
             className="px-8 py-2.5 rounded-xl bg-[#3525cd] text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] disabled:opacity-60 flex items-center gap-2 transition-all shadow-[0px_4px_12px_rgba(79,70,229,0.2)]"
           >
-            {loading ? (
-              <>
-                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
-                Posting...
-              </>
-            ) : form.status === 'active' ? '🚀 Publish Job' : '📝 Save Draft'}
+            {loading ? 'Saving Changes...' : '💾 Save Changes'}
           </button>
         </div>
-
       </form>
     </div>
   )
