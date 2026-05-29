@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import connectDB from '@/lib/db'
 import User from '@/models/User'
+import Company from '@/models/Company'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -29,7 +30,19 @@ export const authOptions: NextAuthOptions = {
         if (!isMatch) throw new Error('Invalid password')
 
         if (!user.isEmailVerified) {
-          throw new Error('Please verify your email first')
+          if (user.role === 'recruiter') {
+            const company = await Company.findOne({ ownerId: user._id })
+            if (company && company.isEmailVerified) {
+              user.isEmailVerified = true
+              user.emailVerifyToken = undefined
+              user.emailVerifyExpires = undefined
+              await user.save()
+            } else {
+              throw new Error('Please verify your email first')
+            }
+          } else {
+            throw new Error('Please verify your email first')
+          }
         }
 
         return {

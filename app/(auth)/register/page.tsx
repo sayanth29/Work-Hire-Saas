@@ -312,6 +312,7 @@ export default function RegisterPage() {
                     value={name}
                     onChange={e => setName(e.target.value)}
                     className="input-premium w-full pl-11 pr-4 py-3 bg-white border border-border rounded-xl text-sm placeholder:text-muted/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    suppressHydrationWarning
                   />
                 </div>
               </div>
@@ -331,6 +332,7 @@ export default function RegisterPage() {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     className="input-premium w-full pl-11 pr-4 py-3 bg-white border border-border rounded-xl text-sm placeholder:text-muted/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    suppressHydrationWarning
                   />
                 </div>
               </div>
@@ -351,6 +353,7 @@ export default function RegisterPage() {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     className="input-premium w-full pl-11 pr-12 py-3 bg-white border border-border rounded-xl text-sm placeholder:text-muted/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    suppressHydrationWarning
                   />
                   <button
                     type="button"
@@ -397,6 +400,7 @@ export default function RegisterPage() {
                         value={companyName}
                         onChange={e => setCompanyName(e.target.value)}
                         className="input-premium w-full pl-11 pr-4 py-3 bg-white border border-border rounded-xl text-sm placeholder:text-muted/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                        suppressHydrationWarning
                       />
                     </div>
                   </div>
@@ -416,6 +420,7 @@ export default function RegisterPage() {
                           value={companyLocation}
                           onChange={e => setCompanyLocation(e.target.value)}
                           className="input-premium w-full pl-10 pr-3 py-3 bg-white border border-border rounded-xl text-sm placeholder:text-muted/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                          suppressHydrationWarning
                         />
                       </div>
                     </div>

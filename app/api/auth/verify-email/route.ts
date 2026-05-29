@@ -38,6 +38,18 @@ export async function GET(req: NextRequest) {
       user.emailVerifyExpires = undefined
       await user.save()
 
+      // Also verify any associated company for recruiter
+      if (user.role === 'recruiter') {
+        await Company.findOneAndUpdate(
+          { ownerId: user._id },
+          {
+            isEmailVerified:    true,
+            emailVerifyToken:   undefined,
+            emailVerifyExpires: undefined,
+          }
+        )
+      }
+
       return NextResponse.redirect(
         `${APP_URL}/verify-email?success=true&type=user`
       )
@@ -56,6 +68,15 @@ export async function GET(req: NextRequest) {
       company.emailVerifyToken   = undefined
       company.emailVerifyExpires = undefined
       await company.save()
+
+      // Also verify the owner User account
+      if (company.ownerId) {
+        await User.findByIdAndUpdate(company.ownerId, {
+          isEmailVerified:    true,
+          emailVerifyToken:   undefined,
+          emailVerifyExpires: undefined,
+        })
+      }
 
       return NextResponse.redirect(
         `${APP_URL}/verify-email?success=true&type=company`

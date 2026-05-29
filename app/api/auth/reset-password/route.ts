@@ -7,30 +7,23 @@ import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 export async function POST(req: NextRequest) {
   try {
     const ip = getClientIp(req.headers)
-    const limit = checkRateLimit(`auth-reset:${ip}`, 12, 60_000)
+    const limit = checkRateLimit(`auth-reset:${ip}`, 5, 60_000)
     if (!limit.allowed) {
       return NextResponse.json(
-        { error: 'Too many reset attempts. Please try again shortly.' },
+        { error: 'Too many requests. Please try again later.' },
         { status: 429, headers: { 'Retry-After': String(limit.retryAfterSec) } }
       )
     }
 
     await connectDB()
-
     const { token, password } = await req.json()
 
     if (!token || !password) {
-      return NextResponse.json(
-        { error: 'Token and password are required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Token and new password are required' }, { status: 400 })
     }
 
     if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 400 })
     }
 
     const hashedToken = crypto
@@ -39,30 +32,27 @@ export async function POST(req: NextRequest) {
       .digest('hex')
 
     const user = await User.findOne({
-      resetPasswordToken:   hashedToken,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     })
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Reset link is invalid or has expired' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid or expired password reset token' }, { status: 400 })
     }
 
-    // pre-save hook hashes the password
-    user.password             = password
-    user.resetPasswordToken   = undefined
+    // Set new password
+    user.password = password
+    user.resetPasswordToken = undefined
     user.resetPasswordExpires = undefined
+    
+    // Auto-verify email upon password reset if they haven't verified it yet
+    user.isEmailVerified = true
+
     await user.save()
 
     return NextResponse.json({ message: 'Password reset successfully!' })
-
   } catch (error) {
     console.error('Reset password error:', error)
-    return NextResponse.json(
-      { error: 'Something went wrong' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
   }
 }

@@ -319,6 +319,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     className="input-premium w-full pl-11 pr-4 py-3 bg-white border border-border rounded-xl text-sm text-foreground placeholder:text-muted/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    suppressHydrationWarning
                   />
                 </div>
               </div>
@@ -345,6 +346,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     className="input-premium w-full pl-11 pr-12 py-3 bg-white border border-border rounded-xl text-sm text-foreground placeholder:text-muted/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    suppressHydrationWarning
                   />
                   <button
                     type="button"
