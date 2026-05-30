@@ -19,7 +19,8 @@ import {
   PlusCircle, 
   CreditCard,
   MessageSquare,
-  AlertCircle
+  AlertCircle,
+  FolderOpen
 } from 'lucide-react'
 
 type RecentApp = {
@@ -193,8 +194,8 @@ export default async function RecruiterDashboardPage() {
             </div>
 
             {typedRecentApps.length === 0 ? (
-              <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl">
-                <span className="text-3xl inline-block mb-3">📭</span>
+              <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl flex flex-col items-center justify-center">
+                <FolderOpen className="w-8 h-8 text-muted/60 mb-3" />
                 <p className="text-sm font-semibold text-muted">No applications received yet</p>
                 {company.isAdminApproved && (
                   <Link

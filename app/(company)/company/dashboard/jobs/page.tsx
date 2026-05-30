@@ -8,6 +8,7 @@ import connectDB from '@/lib/db'
 import Company from '@/models/Company'
 import Job from '@/models/Job'
 import Link from 'next/link'
+import { MapPin, Briefcase, DollarSign, Users } from 'lucide-react'
 
 export default async function ManageJobsPage() {
   const session = await getServerSession(authOptions)
@@ -38,8 +39,8 @@ export default async function ManageJobsPage() {
 
       {/* Jobs list */}
       {jobs.length === 0 ? (
-        <div className="bg-white rounded-xl border border-[#c7c4d8] p-16 text-center">
-          <p className="text-5xl mb-4">💼</p>
+        <div className="bg-white rounded-xl border border-[#c7c4d8] p-16 flex flex-col items-center justify-center text-center">
+          <Briefcase className="w-12 h-12 text-slate-300 mb-4" />
           <h2 className="text-lg font-semibold text-[#0b1c30] mb-2">No jobs posted yet</h2>
           <p className="text-sm text-[#777587] mb-6">Post your first job and start receiving applications</p>
           <Link
@@ -68,19 +69,23 @@ export default async function ManageJobsPage() {
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555]">
-                      📍 {job.location || 'Remote'}
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      {job.location || 'Remote'}
                     </span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] capitalize">
-                      💼 {job.type}
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] capitalize flex items-center gap-1">
+                      <Briefcase className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      {job.type}
                     </span>
                     {job.salary?.min && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555]">
-                        💰 ₹{job.salary.min.toLocaleString()} – ₹{job.salary.max?.toLocaleString()}
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] flex items-center gap-1">
+                        <DollarSign className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        ₹{job.salary.min.toLocaleString()} – ₹{job.salary.max?.toLocaleString()}
                       </span>
                     )}
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555]">
-                      👥 {job.applicantCount} applicants
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] flex items-center gap-1">
+                      <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      {job.applicantCount} applicants
                     </span>
                   </div>
                 </div>

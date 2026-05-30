@@ -33,7 +33,7 @@ export default async function SeekerLayout({
         <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-[#e2e8f0] pl-16 pr-6 md:px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-sm font-bold text-foreground">
-              Welcome back, <span className="text-gradient-primary">{session.user.name}</span> 👋
+              Welcome back, <span className="text-gradient-primary">{session.user.name}</span>
             </h1>
             <p className="text-[11px] font-semibold text-muted tracking-wide mt-0.5">Job Seeker Console</p>
           </div>

@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import axios from 'axios'
+import { MessageSquare, Loader2 } from 'lucide-react'
 
 interface Message {
   _id: string
@@ -100,7 +101,7 @@ export default function MessagesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-4xl animate-pulse">⏳</div>
+        <Loader2 className="w-8 h-8 text-[#3525cd] animate-spin" />
       </div>
     )
   }
@@ -117,8 +118,8 @@ export default function MessagesPage() {
 
         <div className="flex-1 overflow-y-auto">
           {conversations.length === 0 ? (
-            <div className="text-center py-10 px-4">
-              <p className="text-3xl mb-2">💬</p>
+            <div className="text-center py-10 px-4 flex flex-col items-center justify-center">
+              <MessageSquare className="w-8 h-8 text-slate-300 mb-2" />
               <p className="text-xs text-[#777587]">No messages yet. Apply to jobs to start chatting with recruiters.</p>
             </div>
           ) : (
@@ -156,8 +157,8 @@ export default function MessagesPage() {
       <div className="flex-1 bg-white rounded-xl border border-[#c7c4d8] flex flex-col overflow-hidden">
         {!selected ? (
           <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <p className="text-5xl mb-4">💬</p>
+            <div className="text-center flex flex-col items-center justify-center">
+              <MessageSquare className="w-12 h-12 text-slate-300 mb-4" />
               <p className="text-sm font-semibold text-[#0b1c30]">Select a conversation</p>
               <p className="text-xs text-[#777587] mt-1">Choose a conversation from the left</p>
             </div>

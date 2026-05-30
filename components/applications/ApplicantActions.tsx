@@ -6,6 +6,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
+import { MessageSquare } from 'lucide-react'
 
 interface Props {
   applicationId: string
@@ -54,9 +55,10 @@ export default function ApplicantActions({
       {seekerId && (
         <a
           href={`/company/dashboard/messages?userId=${seekerId}&applicationId=${applicationId}`}
-          className="text-xs px-3 py-1.5 rounded-xl border border-[#c7c4d8] text-[#464555] font-semibold hover:bg-[#eff4ff] hover:text-[#3525cd] transition-all"
+          className="text-xs px-3 py-1.5 rounded-xl border border-[#c7c4d8] text-[#464555] font-semibold hover:bg-[#eff4ff] hover:text-[#3525cd] transition-all inline-flex items-center gap-1.5"
         >
-          💬 Message
+          <MessageSquare className="w-3.5 h-3.5" />
+          <span>Message</span>
         </a>
       )}
     </div>

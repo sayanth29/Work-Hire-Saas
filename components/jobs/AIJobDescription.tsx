@@ -280,8 +280,9 @@ export default function AIJobDescription({
               ) : (
                 <div className="space-y-4">
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <h4 className="text-xs font-bold text-[#0b1c30] mb-2 flex items-center gap-1">
-                      <span>✨ Generated Job Description Preview</span>
+                    <h4 className="text-xs font-bold text-[#0b1c30] mb-2 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      <span>Generated Job Description Preview</span>
                     </h4>
                     <pre className="text-[11px] text-[#464555] font-mono leading-relaxed whitespace-pre-wrap max-h-[300px] overflow-y-auto bg-white p-3 rounded-lg border border-slate-100">
                       {generatedDesc}

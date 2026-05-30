@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import axios from 'axios'
+import { Loader2, MessageSquare } from 'lucide-react'
 
 interface Message {
   _id: string
@@ -117,7 +118,7 @@ export default function RecruiterMessagesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-4xl animate-pulse">⏳</div>
+        <Loader2 className="w-8 h-8 text-[#3525cd] animate-spin" />
       </div>
     )
   }
@@ -135,7 +136,7 @@ export default function RecruiterMessagesPage() {
         <div className="flex-1 overflow-y-auto">
           {conversations.length === 0 ? (
             <div className="text-center py-10 px-4">
-              <p className="text-3xl mb-2">💬</p>
+              <MessageSquare className="w-8 h-8 text-[#c7c4d8] mb-2 mx-auto" />
               <p className="text-xs text-[#777587]">No messages yet</p>
             </div>
           ) : (
@@ -174,7 +175,7 @@ export default function RecruiterMessagesPage() {
         {!selected ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <p className="text-5xl mb-4">💬</p>
+              <MessageSquare className="w-12 h-12 text-[#c7c4d8] mb-4 mx-auto" />
               <p className="text-sm font-semibold text-[#0b1c30]">Select a conversation</p>
               <p className="text-xs text-[#777587] mt-1">Click a candidate from the left</p>
             </div>

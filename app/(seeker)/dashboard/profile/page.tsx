@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import type { AxiosError } from 'axios'
+import { User, Briefcase, GraduationCap, FileText, Upload, Lightbulb, Loader2 } from 'lucide-react'
 
 interface Experience {
   _id?: string
@@ -160,7 +161,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-4xl animate-pulse">⏳</div>
+        <Loader2 className="w-8 h-8 text-[#3525cd] animate-spin" />
       </div>
     )
   }
@@ -194,9 +195,15 @@ export default function ProfilePage() {
                 : 'text-[#464555] hover:text-[#3525cd]'
               }`}
           >
-            {t === 'basic' ? '👤 Basic' :
-             t === 'experience' ? '💼 Experience' :
-             t === 'education' ? '🎓 Education' : '📄 Resume'}
+            {t === 'basic' ? (
+              <span className="flex items-center justify-center gap-1.5"><User className="w-3.5 h-3.5 shrink-0" /> Basic</span>
+            ) : t === 'experience' ? (
+              <span className="flex items-center justify-center gap-1.5"><Briefcase className="w-3.5 h-3.5 shrink-0" /> Experience</span>
+            ) : t === 'education' ? (
+              <span className="flex items-center justify-center gap-1.5"><GraduationCap className="w-3.5 h-3.5 shrink-0" /> Education</span>
+            ) : (
+              <span className="flex items-center justify-center gap-1.5"><FileText className="w-3.5 h-3.5 shrink-0" /> Resume</span>
+            )}
           </button>
         ))}
       </div>
@@ -293,8 +300,8 @@ export default function ProfilePage() {
             </div>
 
             {experience.length === 0 ? (
-              <div className="text-center py-10">
-                <p className="text-3xl mb-2">💼</p>
+              <div className="text-center py-10 flex flex-col items-center justify-center">
+                <Briefcase className="w-8 h-8 text-slate-300 mb-2" />
                 <p className="text-sm text-[#777587]">No experience added yet</p>
               </div>
             ) : (
@@ -391,8 +398,8 @@ export default function ProfilePage() {
             </div>
 
             {education.length === 0 ? (
-              <div className="text-center py-10">
-                <p className="text-3xl mb-2">🎓</p>
+              <div className="text-center py-10 flex flex-col items-center justify-center">
+                <GraduationCap className="w-8 h-8 text-slate-300 mb-2" />
                 <p className="text-sm text-[#777587]">No education added yet</p>
               </div>
             ) : (
@@ -474,7 +481,7 @@ export default function ProfilePage() {
             {resumeUrl ? (
               <div className="p-4 rounded-xl bg-[#eff4ff] border border-[#3525cd]/20 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl">📄</span>
+                  <FileText className="w-8 h-8 text-[#3525cd] shrink-0" />
                   <div>
                     <p className="text-sm font-semibold text-[#0b1c30]">Resume uploaded</p>
                     <p className="text-xs text-[#777587]">PDF document</p>
@@ -505,8 +512,14 @@ export default function ProfilePage() {
               </div>
             ) : (
               <label className="block cursor-pointer">
-                <div className="border-2 border-dashed border-[#c7c4d8] rounded-xl p-10 text-center hover:border-[#3525cd] hover:bg-[#eff4ff] transition-all">
-                  <p className="text-4xl mb-3">{uploading ? '⏳' : '📤'}</p>
+                <div className="border-2 border-dashed border-[#c7c4d8] rounded-xl p-10 text-center hover:border-[#3525cd] hover:bg-[#eff4ff] transition-all flex flex-col items-center justify-center">
+                  <div className="mb-3">
+                    {uploading ? (
+                      <Loader2 className="w-8 h-8 text-[#3525cd] animate-spin" />
+                    ) : (
+                      <Upload className="w-8 h-8 text-slate-400" />
+                    )}
+                  </div>
                   <p className="text-sm font-semibold text-[#0b1c30] mb-1">
                     {uploading ? 'Uploading...' : 'Upload your Resume'}
                   </p>
@@ -523,7 +536,10 @@ export default function ProfilePage() {
             )}
 
             <div className="bg-[#e5eeff] rounded-xl p-4">
-              <p className="text-xs font-semibold text-[#3525cd] mb-1">💡 Tips for a great resume</p>
+              <p className="text-xs font-semibold text-[#3525cd] mb-1 flex items-center gap-1.5">
+                <Lightbulb className="w-3.5 h-3.5 shrink-0" />
+                Tips for a great resume
+              </p>
               <ul className="text-xs text-[#464555] space-y-1 list-disc list-inside">
                 <li>Keep it to 1-2 pages max</li>
                 <li>Include keywords from job descriptions</li>

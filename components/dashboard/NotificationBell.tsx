@@ -111,7 +111,7 @@ export default function NotificationBell() {
           <div className="flex-1 overflow-y-auto max-h-[280px] divide-y divide-[#e2e8f0]/60">
             {notifications.length === 0 ? (
               <div className="p-8 text-center text-[#777587]">
-                <p className="text-2xl mb-1.5">🔔</p>
+                <Bell className="w-8 h-8 text-[#c7c4d8] mb-1.5 mx-auto animate-pulse" />
                 <p className="text-[11px] font-bold">All caught up!</p>
                 <p className="text-[10px] text-[#a0aec0] mt-0.5">You have no new notifications.</p>
               </div>

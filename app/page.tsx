@@ -26,7 +26,8 @@ import {
   HardHat,
   Settings,
   ShoppingBag,
-  Hotel
+  Hotel,
+  Heart
 } from 'lucide-react'
 import CategoryGrid from '@/components/CategoryGrid'
 import TestimonialCarousel from '@/components/TestimonialCarousel'
@@ -210,14 +211,14 @@ export default async function LandingPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">
-                <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-3 text-center">
-                  <span className="text-xl">👩‍🏫</span>
-                  <p className="text-xs font-bold text-foreground mt-1">Education</p>
+                <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                  <GraduationCap className="w-6 h-6 text-amber-500 mb-1" />
+                  <p className="text-xs font-bold text-foreground">Education</p>
                   <p className="text-[9px] text-muted">Verified roles</p>
                 </div>
-                <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-3 text-center">
-                  <span className="text-xl">👩‍⚕️</span>
-                  <p className="text-xs font-bold text-foreground mt-1">Healthcare</p>
+                <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                  <HeartPulse className="w-6 h-6 text-rose-500 mb-1" />
+                  <p className="text-xs font-bold text-foreground">Healthcare</p>
                   <p className="text-[9px] text-muted">Global openings</p>
                 </div>
               </div>
@@ -375,12 +376,14 @@ export default async function LandingPage() {
                     </span>
                     {job.location && (
                       <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-50 border border-slate-100 text-muted uppercase tracking-wider flex items-center gap-1">
-                        📍 {job.location}
+                        <MapPin className="w-3 h-3 text-muted/70 shrink-0" />
+                        {job.location}
                       </span>
                     )}
                     {salaryText && (
                       <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 uppercase tracking-wider flex items-center gap-1">
-                        💰 {salaryText}
+                        <DollarSign className="w-3 h-3 text-emerald-500 shrink-0" />
+                        {salaryText}
                       </span>
                     )}
                   </div>
@@ -636,8 +639,8 @@ export default async function LandingPage() {
 
           <div className="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted font-medium">
             <p>© 2026 WorkHire. All rights reserved.</p>
-            <p>
-              Made with ❤️ for recruiters & seekers globally · <span className="text-primary font-bold">workhire.com</span>
+            <p className="flex items-center gap-1">
+              Made with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline mx-0.5" /> for recruiters & seekers globally · <span className="text-primary font-bold">workhire.com</span>
             </p>
           </div>
         </div>

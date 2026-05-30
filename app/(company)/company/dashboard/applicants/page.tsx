@@ -8,6 +8,7 @@ import connectDB from '@/lib/db'
 import Company from '@/models/Company'
 import Application from '@/models/Application'
 import ApplicantActions from '@/components/applications/ApplicantActions'
+import { Users, FileText } from 'lucide-react'
 
 interface Props {
   searchParams: { jobId?: string; status?: string }
@@ -98,7 +99,7 @@ export default async function ApplicantsPage({ searchParams }: Props) {
       {/* List */}
       {typedApplications.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#c7c4d8] p-16 text-center">
-          <p className="text-5xl mb-4">👥</p>
+          <Users className="w-12 h-12 text-[#c7c4d8] mb-4 mx-auto" />
           <h2 className="text-lg font-semibold text-[#0b1c30] mb-2">No applicants yet</h2>
           <p className="text-sm text-[#777587]">Applications will appear here once candidates apply</p>
         </div>
@@ -156,9 +157,10 @@ export default async function ApplicantsPage({ searchParams }: Props) {
                         href={app.seekerId.resume}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs px-3 py-1.5 rounded-xl bg-[#e2dfff] text-[#3525cd] font-semibold hover:bg-[#3525cd] hover:text-white transition-all"
+                        className="text-xs px-3 py-1.5 rounded-xl bg-[#e2dfff] text-[#3525cd] font-semibold hover:bg-[#3525cd] hover:text-white transition-all inline-flex items-center gap-1.5"
                       >
-                        📄 View Resume
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>View Resume</span>
                       </a>
                     )}
 

@@ -16,7 +16,8 @@ import {
   FileText, 
   Compass, 
   ChevronRight,
-  TrendingUp
+  TrendingUp,
+  FolderOpen
 } from 'lucide-react'
 
 type DashboardApp = {
@@ -134,8 +135,8 @@ export default async function SeekerDashboardPage() {
             </div>
 
             {typedApplications.length === 0 ? (
-              <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl">
-                <span className="text-3xl inline-block mb-3">📭</span>
+              <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl flex flex-col items-center justify-center">
+                <FolderOpen className="w-8 h-8 text-slate-300 mb-3" />
                 <p className="text-sm font-semibold text-muted">No applications submitted yet</p>
                 <Link
                   href="/jobs"

@@ -8,6 +8,7 @@ import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import type { AxiosError } from 'axios'
+import { Loader2, Trash2, Save, Rocket, FileText } from 'lucide-react'
 import AIJobDescription from '@/components/jobs/AIJobDescription'
 
 interface EditJobPageProps {
@@ -126,7 +127,7 @@ export default function EditJobPage({ params }: EditJobPageProps) {
   if (pageLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-4xl animate-pulse">⏳</div>
+        <Loader2 className="w-8 h-8 text-[#3525cd] animate-spin" />
       </div>
     )
   }
@@ -143,9 +144,19 @@ export default function EditJobPage({ params }: EditJobPageProps) {
           type="button"
           onClick={handleDelete}
           disabled={deleting}
-          className="px-4 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 text-xs font-semibold transition-all active:scale-[0.98]"
+          className="px-4 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 text-xs font-semibold transition-all active:scale-[0.98] flex items-center gap-1.5"
         >
-          {deleting ? 'Deleting...' : '🗑 Delete Job'}
+          {deleting ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Deleting...</span>
+            </>
+          ) : (
+            <>
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Delete Job</span>
+            </>
+          )}
         </button>
       </div>
 
@@ -323,9 +334,9 @@ export default function EditJobPage({ params }: EditJobPageProps) {
           <h2 className="font-semibold text-[#0b1c30] mb-3">Publish Options</h2>
           <div className="flex gap-3">
             {[
-              { value: 'active', label: '🚀 Publish Now',  desc: 'Visible to job seekers immediately' },
-              { value: 'draft',  label: '📝 Save as Draft', desc: 'Save and edit later' },
-            ].map(({ value, label, desc }) => (
+              { value: 'active', label: 'Publish Now', icon: Rocket, desc: 'Visible to job seekers immediately' },
+              { value: 'draft',  label: 'Save as Draft', icon: FileText, desc: 'Save and edit later' },
+            ].map(({ value, label, icon: Icon, desc }) => (
               <label
                 key={value}
                 className={`flex-1 p-3 rounded-xl border cursor-pointer transition-all ${
@@ -342,8 +353,11 @@ export default function EditJobPage({ params }: EditJobPageProps) {
                   onChange={e => update('status', e.target.value)}
                   className="sr-only"
                 />
-                <p className="text-sm font-semibold text-[#0b1c30]">{label}</p>
-                <p className="text-xs text-[#777587] mt-0.5">{desc}</p>
+                <div className="flex items-center gap-2">
+                  <Icon className={`w-4 h-4 ${form.status === value ? 'text-[#3525cd]' : 'text-[#777587]'}`} />
+                  <p className="text-sm font-semibold text-[#0b1c30]">{label}</p>
+                </div>
+                <p className="text-xs text-[#777587] mt-0.5 ml-6">{desc}</p>
               </label>
             ))}
           </div>
@@ -363,7 +377,17 @@ export default function EditJobPage({ params }: EditJobPageProps) {
             disabled={loading}
             className="px-8 py-2.5 rounded-xl bg-[#3525cd] text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] disabled:opacity-60 flex items-center gap-2 transition-all shadow-[0px_4px_12px_rgba(79,70,229,0.2)]"
           >
-            {loading ? 'Saving Changes...' : '💾 Save Changes'}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Saving Changes...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>Save Changes</span>
+              </>
+            )}
           </button>
         </div>
       </form>

@@ -42,7 +42,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
         try {
           await sendEmail({
             to: companyEmail,
-            subject: 'Your Company Account Has Been Approved! 🎉',
+            subject: 'Your Company Account Has Been Approved!',
             html: companyApprovedTemplate({ name: companyName || company.name }),
           })
         } catch (emailErr) {

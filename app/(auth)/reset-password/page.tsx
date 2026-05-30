@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import Link from 'next/link'
+import { Briefcase, Building2, Star } from 'lucide-react'
 
 function LockIcon({ className }: { className?: string }) {
   return (
@@ -35,9 +36,9 @@ function EyeOffIcon({ className }: { className?: string }) {
 }
 
 const stats = [
-  { value: '50K+', label: 'Active Jobs', icon: '💼' },
-  { value: '12K+', label: 'Companies', icon: '🏢' },
-  { value: '98%',  label: 'Satisfaction', icon: '⭐' },
+  { value: '50K+', label: 'Active Jobs', icon: Briefcase, color: 'text-indigo-200' },
+  { value: '12K+', label: 'Companies', icon: Building2, color: 'text-cyan-200' },
+  { value: '98%',  label: 'Satisfaction', icon: Star, color: 'text-amber-200' },
 ]
 
 function ResetPasswordForm() {
@@ -283,16 +284,21 @@ export default function ResetPasswordPage() {
 
             {/* Stat cards */}
             <div className="flex gap-4">
-              {stats.map((s) => (
-                <div
-                  key={s.label}
-                  className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl px-5 py-4 flex-1"
-                >
-                  <div className="text-sm mb-1">{s.icon}</div>
-                  <div className="text-2xl font-bold text-white">{s.value}</div>
-                  <div className="text-xs text-white/60 mt-0.5">{s.label}</div>
-                </div>
-              ))}
+              {stats.map((s) => {
+                const Icon = s.icon
+                return (
+                  <div
+                    key={s.label}
+                    className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl px-5 py-4 flex-1 transition-all duration-300 hover:bg-white/15 hover:scale-[1.02]"
+                  >
+                    <div className={`${s.color} mb-2`}>
+                      <Icon className="w-5 h-5 stroke-[1.8]" />
+                    </div>
+                    <div className="text-2xl font-bold text-white">{s.value}</div>
+                    <div className="text-xs text-white/60 mt-0.5">{s.label}</div>
+                  </div>
+                )
+              })}
             </div>
           </div>
 

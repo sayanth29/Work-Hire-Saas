@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import type { AxiosError } from 'axios'
+import { Star, Building2 } from 'lucide-react'
 
 const plans = [
   {
@@ -20,7 +21,8 @@ const plans = [
       'Email notifications',
     ],
     color:  'border-[#c7c4d8]',
-    badge:  '',
+    badgeText: '',
+    badgeIcon: null,
   },
   {
     key:   'pro',
@@ -35,7 +37,8 @@ const plans = [
       'AI candidate ranking',
     ],
     color: 'border-[#3525cd]',
-    badge: '⭐ Most Popular',
+    badgeText: 'Most Popular',
+    badgeIcon: Star,
   },
   {
     key:   'enterprise',
@@ -50,7 +53,8 @@ const plans = [
       'API access',
     ],
     color: 'border-[#4648d4]',
-    badge: '🏢 For Teams',
+    badgeText: 'For Teams',
+    badgeIcon: Building2,
   },
 ]
 
@@ -171,9 +175,10 @@ export default function BillingPage() {
                 plan.key === 'pro' ? 'shadow-[0px_4px_20px_rgba(53,37,205,0.12)]' : ''
               }`}
             >
-              {plan.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#3525cd] text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
-                  {plan.badge}
+              {plan.badgeText && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#3525cd] text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap flex items-center gap-1">
+                  {plan.badgeIcon && <plan.badgeIcon className="w-3.5 h-3.5 fill-current" />}
+                  <span>{plan.badgeText}</span>
                 </div>
               )}
 
@@ -210,7 +215,7 @@ export default function BillingPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                   </svg>
-                ) : isCurrent ? '✅ Current Plan' :
+                ) : isCurrent ? 'Current Plan' :
                    plan.key === 'free' ? 'Free Forever' : `Upgrade to ${plan.name}`}
               </button>
             </div>

@@ -5,7 +5,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import LandingHeader from '@/components/LandingHeader'
-import { Shield, Lock, FileText, CheckCircle2 } from 'lucide-react'
+import { Shield, Lock, FileText, CheckCircle2, Heart } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy — Data Protection | WorkHire',
@@ -250,8 +250,8 @@ export default function PrivacyPage() {
 
           <div className="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted font-medium">
             <p>© 2026 WorkHire. All rights reserved.</p>
-            <p>
-              Made with ❤️ for recruiters & seekers globally · <span className="text-primary font-bold">workhire.com</span>
+            <p className="flex items-center gap-1">
+              Made with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline mx-0.5" /> for recruiters & seekers globally · <span className="text-primary font-bold">workhire.com</span>
             </p>
           </div>
         </div>

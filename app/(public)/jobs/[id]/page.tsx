@@ -12,6 +12,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import ApplyButton from '@/components/jobs/ApplyButton'
 import type { Metadata } from 'next'
+import { MapPin, Briefcase, DollarSign, Clock, Users, Globe } from 'lucide-react'
 
 interface Props { 
   params: Promise<{ id: string }> 
@@ -177,18 +178,21 @@ export default async function JobDetailPage({ params }: Props) {
                       {job.type}
                     </span>
                     {job.location && (
-                      <span className="text-xs px-3 py-1 rounded-full bg-[#eff4ff] text-[#464555]">
-                        📍 {job.location}
+                      <span className="text-xs px-3 py-1 rounded-full bg-[#eff4ff] text-[#464555] flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        {job.location}
                       </span>
                     )}
                     {job.experience && (
-                      <span className="text-xs px-3 py-1 rounded-full bg-[#eff4ff] text-[#464555]">
-                        💼 {job.experience} yrs exp
+                      <span className="text-xs px-3 py-1 rounded-full bg-[#eff4ff] text-[#464555] flex items-center gap-1">
+                        <Briefcase className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        {job.experience} yrs exp
                       </span>
                     )}
                     {job.salary?.min && (
-                      <span className="text-xs px-3 py-1 rounded-full bg-[#eff4ff] text-[#464555]">
-                        💰 ₹{job.salary.min.toLocaleString()} – ₹{job.salary.max?.toLocaleString()}
+                      <span className="text-xs px-3 py-1 rounded-full bg-[#eff4ff] text-[#464555] flex items-center gap-1">
+                        <DollarSign className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        ₹{job.salary.min.toLocaleString()} – ₹{job.salary.max?.toLocaleString()}
                       </span>
                     )}
                   </div>
@@ -245,8 +249,9 @@ export default async function JobDetailPage({ params }: Props) {
                   {job.applicantCount} applicant{job.applicantCount !== 1 ? 's' : ''}
                 </p>
                 {job.deadline && (
-                  <p className="text-xs text-amber-600 mt-0.5">
-                    ⏰ Deadline: {new Date(job.deadline).toLocaleDateString('en-IN', {
+                  <p className="text-xs text-amber-600 mt-0.5 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 shrink-0" />
+                    Deadline: {new Date(job.deadline).toLocaleDateString('en-IN', {
                       day: 'numeric', month: 'short', year: 'numeric'
                     })}
                   </p>
@@ -278,21 +283,28 @@ export default async function JobDetailPage({ params }: Props) {
                   {job.companyId.description}
                 </p>
               )}
-              <div className="space-y-1">
+              <div className="space-y-1.5 mt-3 pt-3 border-t border-slate-100">
                 {job.companyId?.location && (
-                  <p className="text-xs text-[#777587]">📍 {job.companyId.location}</p>
+                  <p className="text-xs text-[#777587] flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    {job.companyId.location}
+                  </p>
                 )}
                 {job.companyId?.size && (
-                  <p className="text-xs text-[#777587]">👥 {job.companyId.size} employees</p>
+                  <p className="text-xs text-[#777587] flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    {job.companyId.size} employees
+                  </p>
                 )}
                 {job.companyId?.website && (
                   <a
                     href={job.companyId.website}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs text-[#3525cd] hover:underline block"
+                    className="text-xs text-[#3525cd] hover:underline flex items-center gap-1.5 font-semibold"
                   >
-                    🌐 Visit Website
+                    <Globe className="w-3.5 h-3.5 shrink-0" />
+                    Visit Website
                   </a>
                 )}
               </div>

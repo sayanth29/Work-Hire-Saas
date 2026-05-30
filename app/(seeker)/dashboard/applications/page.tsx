@@ -7,6 +7,7 @@ import { authOptions } from '@/utils/auth'
 import connectDB from '@/lib/db'
 import Application from '@/models/Application'
 import Link from 'next/link'
+import { Send, Eye, Target, CheckCircle2, XCircle, MapPin, Briefcase, DollarSign, FolderOpen } from 'lucide-react'
 
 type SeekerApplication = {
   _id: { toString: () => string }
@@ -40,12 +41,12 @@ export default async function ApplicationsPage() {
     rejected:  'bg-[#ffdad6] text-[#93000a]',
   }
 
-  const statusIcons: Record<string, string> = {
-    applied:   '📤',
-    reviewed:  '👀',
-    interview: '🎯',
-    hired:     '✅',
-    rejected:  '❌',
+  const statusIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+    applied:   Send,
+    reviewed:  Eye,
+    interview: Target,
+    hired:     CheckCircle2,
+    rejected:  XCircle,
   }
   const typedApplications = applications as unknown as SeekerApplication[]
 
@@ -83,8 +84,8 @@ export default async function ApplicationsPage() {
 
       {/* List */}
       {typedApplications.length === 0 ? (
-        <div className="bg-white rounded-xl border border-[#c7c4d8] p-16 text-center">
-          <p className="text-5xl mb-4">📭</p>
+        <div className="bg-white rounded-xl border border-[#c7c4d8] p-16 flex flex-col items-center justify-center text-center">
+          <FolderOpen className="w-12 h-12 text-slate-300 mb-4" />
           <h2 className="text-lg font-semibold text-[#0b1c30] mb-2">No applications yet</h2>
           <p className="text-sm text-[#777587] mb-6">Start applying to jobs and track them here</p>
           <Link
@@ -114,15 +115,18 @@ export default async function ApplicationsPage() {
                     </h3>
                     <p className="text-sm text-[#464555]">{app.companyId?.name}</p>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555]">
-                        📍 {app.jobId?.location || 'Remote'}
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        {app.jobId?.location || 'Remote'}
                       </span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] capitalize">
-                        💼 {app.jobId?.type || 'Full-time'}
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] capitalize flex items-center gap-1">
+                        <Briefcase className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        {app.jobId?.type || 'Full-time'}
                       </span>
                       {app.jobId?.salary?.min && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555]">
-                          💰 ₹{app.jobId.salary.min.toLocaleString()} – ₹{app.jobId.salary.max?.toLocaleString()}
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#eff4ff] text-[#464555] flex items-center gap-1">
+                          <DollarSign className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                          ₹{app.jobId.salary.min.toLocaleString()} – ₹{app.jobId.salary.max?.toLocaleString()}
                         </span>
                       )}
                     </div>
@@ -131,9 +135,15 @@ export default async function ApplicationsPage() {
 
                 {/* Status */}
                 <div className="flex flex-col items-end gap-2 shrink-0">
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize flex items-center gap-1 ${statusColors[app.status]}`}>
-                    {statusIcons[app.status]} {app.status}
-                  </span>
+                  {(() => {
+                    const StatusIcon = statusIcons[app.status]
+                    return (
+                      <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize flex items-center gap-1.5 ${statusColors[app.status]}`}>
+                        {StatusIcon && <StatusIcon className="w-3.5 h-3.5 shrink-0" />}
+                        {app.status}
+                      </span>
+                    )
+                  })()}
                   <p className="text-xs text-[#777587]">
                     {new Date(app.createdAt).toLocaleDateString('en-IN', {
                       day: 'numeric', month: 'short', year: 'numeric'

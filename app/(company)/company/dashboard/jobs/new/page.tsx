@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import type { AxiosError } from 'axios'
 import AIJobDescription from '@/components/jobs/AIJobDescription'
+import { Rocket, FileText } from 'lucide-react'
 
 export default function NewJobPage() {
   const router = useRouter()
@@ -248,12 +249,12 @@ export default function NewJobPage() {
           <h2 className="font-semibold text-[#0b1c30] mb-3">Publish Options</h2>
           <div className="flex gap-3">
             {[
-              { value: 'active', label: '🚀 Publish Now',  desc: 'Visible to job seekers immediately' },
-              { value: 'draft',  label: '📝 Save as Draft', desc: 'Save and publish later' },
-            ].map(({ value, label, desc }) => (
+              { value: 'active', label: 'Publish Now',  desc: 'Visible to job seekers immediately', icon: Rocket },
+              { value: 'draft',  label: 'Save as Draft', desc: 'Save and publish later', icon: FileText },
+            ].map(({ value, label, desc, icon: Icon }) => (
               <label
                 key={value}
-                className={`flex-1 p-3 rounded-xl border cursor-pointer transition-all ${
+                className={`flex-1 p-3 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
                   form.status === value
                     ? 'border-[#3525cd] bg-[#eff4ff]'
                     : 'border-[#c7c4d8] hover:border-[#3525cd]/40'
@@ -267,8 +268,13 @@ export default function NewJobPage() {
                   onChange={e => update('status', e.target.value)}
                   className="sr-only"
                 />
-                <p className="text-sm font-semibold text-[#0b1c30]">{label}</p>
-                <p className="text-xs text-[#777587] mt-0.5">{desc}</p>
+                <div className={`mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center ${form.status === value ? 'bg-[#e2dfff] text-[#3525cd]' : 'bg-slate-50 text-[#777587]'}`}>
+                  <Icon className="w-4 h-4 shrink-0" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#0b1c30]">{label}</p>
+                  <p className="text-xs text-[#777587] mt-0.5">{desc}</p>
+                </div>
               </label>
             ))}
           </div>
@@ -286,7 +292,7 @@ export default function NewJobPage() {
           <button
             type="submit"
             disabled={loading}
-            className="px-8 py-2.5 rounded-xl bg-[#3525cd] text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] disabled:opacity-60 flex items-center gap-2 transition-all shadow-[0px_4px_12px_rgba(79,70,229,0.2)]"
+            className="px-8 py-2.5 rounded-xl bg-[#3525cd] text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] disabled:opacity-60 flex items-center gap-2 transition-all shadow-[0px_4px_12px_rgba(79,70,229,0.2)] cursor-pointer"
           >
             {loading ? (
               <>
@@ -296,7 +302,17 @@ export default function NewJobPage() {
                 </svg>
                 Posting...
               </>
-            ) : form.status === 'active' ? '🚀 Publish Job' : '📝 Save Draft'}
+            ) : form.status === 'active' ? (
+              <>
+                <Rocket className="w-4 h-4 shrink-0" />
+                <span>Publish Job</span>
+              </>
+            ) : (
+              <>
+                <FileText className="w-4 h-4 shrink-0" />
+                <span>Save Draft</span>
+              </>
+            )}
           </button>
         </div>
 

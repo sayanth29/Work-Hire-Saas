@@ -261,8 +261,8 @@ export default async function JobsPage({ searchParams }: Props) {
 
             {/* Jobs List container */}
             {typedJobs.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-[#e2e8f0] p-12 text-center shadow-sm">
-                <p className="text-3xl mb-3">🔍</p>
+              <div className="bg-white rounded-2xl border border-[#e2e8f0] p-12 flex flex-col items-center justify-center text-center shadow-sm">
+                <Search className="w-8 h-8 text-slate-300 mb-3" />
                 <h3 className="text-sm font-bold text-foreground mb-1">No vacancies found</h3>
                 <p className="text-xs text-muted">Try using different search keywords or resetting your type filters.</p>
               </div>
